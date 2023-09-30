@@ -467,37 +467,36 @@ void Channel::DefaultTimerfdReadEventHandler()
 
 void Channel::DefaultEventfdWriteEventHandler()
 {
-
     if (write_callback_) {
         // iov_base第一个字节用于标识该段char*由谁删除,1表示需要在这里删除
         struct iovec *write_iovec;
-        if (write_callback_flag_ && write_iovec) {
-            int len = write_iovec[0].iov_len;
+        if (write_callback_flag_ && write_iovec_) {
+            int len = write_iovec_[0].iov_len;
             write_iovec = new struct iovec[len];
             for (int i = 0; i < len; i++) {
-                write_iovec[i].iov_base = write_iovec[i].iov_base;
-                write_iovec[i].iov_len = write_iovec[i].iov_len;
+                write_iovec[i].iov_base = write_iovec_[i].iov_base;
+                write_iovec[i].iov_len = write_iovec_[i].iov_len;
             }
         }
         if (!write_callback_flag_) {
             struct iovec read_str[3];
             struct sockaddr_in addr;
             InitIovec(read_str, &addr, false);
-            write_iovec = write_callback_(read_str); // 将写缓冲区的内容传给写回调函数，并返回需要写的内容,write_iovec需要在Process中删除,write_iovec写的是一些常态化数据,如文件内容,write_buffer缓冲区内容等，不需要在Process中删除
+            write_iovec_ = write_callback_(read_str); // 将写缓冲区的内容传给写回调函数，并返回需要写的内容,write_iovec_需要在Process中删除,write_iovec写的是一些常态化数据,如文件内容,write_buffer缓冲区内容等，不需要在Process中删除
             write_callback_flag_ = true;
-            int len = write_iovec[0].iov_len;
+            int len = write_iovec_[0].iov_len;
             write_iovec = new struct iovec[len];
             for (int i = 0; i < len; i++) {
-                write_iovec[i].iov_base = write_iovec[i].iov_base;
-                write_iovec[i].iov_len = write_iovec[i].iov_len;
+                write_iovec[i].iov_base = write_iovec_[i].iov_base;
+                write_iovec[i].iov_len = write_iovec_[i].iov_len;
             }
         }
         if (!Send(write_iovec + 1, write_iovec[0].iov_len - 1)) {
             // 错误关闭
 
             delete[] write_iovec;
-            if (write_iovec) {
-                ProcessIovec(write_iovec);
+            if (write_iovec_) {
+                ProcessIovec(write_iovec_);
             }
             // printf("sure close!\n");
             Close();
@@ -510,8 +509,8 @@ void Channel::DefaultEventfdWriteEventHandler()
         if (write_flag_) {
             write_buffer_.Clear();
 
-            if (write_iovec) {
-                ProcessIovec(write_iovec);
+            if (write_iovec_) {
+                ProcessIovec(write_iovec_);
                 if ((!read_or_write_) || (!alive_)) {
                     Close();
                     return;
@@ -520,7 +519,7 @@ void Channel::DefaultEventfdWriteEventHandler()
             }
             write_flag_ = false;
             write_callback_flag_ = false;
-            write_iovec = nullptr;
+            write_iovec_ = nullptr;
         }
     } else {
         Close();
