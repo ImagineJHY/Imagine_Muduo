@@ -1,5 +1,5 @@
 ### CMake ###
-CMakeFiles
+/CMakeFiles
 CmakeCache.txt
 cmake_install.cmake
 
