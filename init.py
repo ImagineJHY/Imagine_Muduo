@@ -4,7 +4,7 @@ import yaml
 
 # 确保Imagine System路径中所有的中间目录都存在
 thirdparty_dir_path = 'thirdparty/'
-os.makedirs(os.path.dirname(thirdparty_dir_path), exist_ok=True)
+os.makedirs(os.path.dirname(thirdparty_dir_path), exist_ok = True)
 
 system_dir_path = os.path.join(thirdparty_dir_path, 'Imagine_System')
 
