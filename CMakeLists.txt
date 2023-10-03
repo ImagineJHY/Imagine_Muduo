@@ -6,8 +6,8 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 add_library(imagine_muduo SHARED ${SRC_LIST})
 
 add_custom_target(
-    set_up ALL # ALL代表每次构建都会运行这个目标
-    COMMAND source thirdparty/Imagine_System/setup.sh
+    setup ALL # ALL代表每次构建都会运行这个目标
+    COMMAND ./thirdparty/Imagine_System/setup.sh
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR} # 在哪个目录下执行命令
 )
 
