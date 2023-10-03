@@ -111,19 +111,6 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named setup
-
-# Build rule for target.
-setup: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 setup
-.PHONY : setup
-
-# fast build rule for target.
-setup/fast:
-	$(MAKE) -f CMakeFiles/setup.dir/build.make CMakeFiles/setup.dir/build
-.PHONY : setup/fast
-
-#=============================================================================
 # Target rules for targets named imagine_muduo
 
 # Build rule for target.
@@ -148,6 +135,32 @@ init: cmake_check_build_system
 init/fast:
 	$(MAKE) -f CMakeFiles/init.dir/build.make CMakeFiles/init.dir/build
 .PHONY : init/fast
+
+#=============================================================================
+# Target rules for targets named prepare
+
+# Build rule for target.
+prepare: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 prepare
+.PHONY : prepare
+
+# fast build rule for target.
+prepare/fast:
+	$(MAKE) -f thirdparty/Imagine_System/CMakeFiles/prepare.dir/build.make thirdparty/Imagine_System/CMakeFiles/prepare.dir/build
+.PHONY : prepare/fast
+
+#=============================================================================
+# Target rules for targets named init_all
+
+# Build rule for target.
+init_all: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 init_all
+.PHONY : init_all
+
+# fast build rule for target.
+init_all/fast:
+	$(MAKE) -f thirdparty/Imagine_System/CMakeFiles/init_all.dir/build.make thirdparty/Imagine_System/CMakeFiles/init_all.dir/build
+.PHONY : init_all/fast
 
 src/Channel.o: src/Channel.cpp.o
 
@@ -265,9 +278,10 @@ help:
 	@echo "... depend"
 	@echo "... rebuild_cache"
 	@echo "... edit_cache"
-	@echo "... setup"
 	@echo "... imagine_muduo"
 	@echo "... init"
+	@echo "... prepare"
+	@echo "... init_all"
 	@echo "... src/Channel.o"
 	@echo "... src/Channel.i"
 	@echo "... src/Channel.s"
