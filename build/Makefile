@@ -111,17 +111,17 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named init
+# Target rules for targets named setup
 
 # Build rule for target.
-init: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 init
-.PHONY : init
+setup: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 setup
+.PHONY : setup
 
 # fast build rule for target.
-init/fast:
-	$(MAKE) -f CMakeFiles/init.dir/build.make CMakeFiles/init.dir/build
-.PHONY : init/fast
+setup/fast:
+	$(MAKE) -f CMakeFiles/setup.dir/build.make CMakeFiles/setup.dir/build
+.PHONY : setup/fast
 
 #=============================================================================
 # Target rules for targets named imagine_muduo
@@ -137,17 +137,17 @@ imagine_muduo/fast:
 .PHONY : imagine_muduo/fast
 
 #=============================================================================
-# Target rules for targets named setup
+# Target rules for targets named init
 
 # Build rule for target.
-setup: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 setup
-.PHONY : setup
+init: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 init
+.PHONY : init
 
 # fast build rule for target.
-setup/fast:
-	$(MAKE) -f CMakeFiles/setup.dir/build.make CMakeFiles/setup.dir/build
-.PHONY : setup/fast
+init/fast:
+	$(MAKE) -f CMakeFiles/init.dir/build.make CMakeFiles/init.dir/build
+.PHONY : init/fast
 
 src/Channel.o: src/Channel.cpp.o
 
@@ -265,9 +265,9 @@ help:
 	@echo "... depend"
 	@echo "... rebuild_cache"
 	@echo "... edit_cache"
-	@echo "... init"
-	@echo "... imagine_muduo"
 	@echo "... setup"
+	@echo "... imagine_muduo"
+	@echo "... init"
 	@echo "... src/Channel.o"
 	@echo "... src/Channel.i"
 	@echo "... src/Channel.s"
