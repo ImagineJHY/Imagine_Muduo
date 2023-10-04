@@ -24,7 +24,7 @@ endif()
 
 # 若当前的任务是编译动态库, 则构建TARGET: init, prepare, build
 # 若当前的任务是生成项目, 则不构建上述TARGET
-if(NOT ${IS_MAKE_PROJECT})
+if(NOT ${IS_MAKE_PROJECT} AND DEFINED TARGET_LIB AND ${TARGET_LIB} STREQUAL "Imagine_Muduo")
     add_custom_target(
         init
         COMMAND python3 init.py
