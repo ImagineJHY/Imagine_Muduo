@@ -9,6 +9,7 @@
 /thirdparty/Imagine_System/
 
 # lib
+*.a
 *.bak
 *.so*
 
