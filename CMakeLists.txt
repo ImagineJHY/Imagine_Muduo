@@ -55,5 +55,5 @@ endif()
 # 设置动态库的TARGET的头文件, 源文件, 依赖
 file(GLOB IMAGINE_MUDUO_SRC_LIST ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
 add_library(imagine_muduo SHARED ${IMAGINE_MUDUO_SRC_LIST})
-target_include_directories(imagine_muduo ${CMAKE_CURRENT_SOURCE_DIR}/include)
+target_include_directories(imagine_muduo PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_link_libraries(imagine_muduo pthread)
