@@ -134,13 +134,10 @@ void Channel::ProcessIovec(struct iovec *io_block)
 
     for (int i = block_num - 1; i > 0; i--) {
         if (*((char *)(io_block[0].iov_base) + i) == '1') {
-            printf("in Channel.cpp 137 delete %p\n", (void*)io_block[i].iov_base);
             delete[] (char *)(io_block[i].iov_base);
         }
     }
 
-    printf("in Channel.cpp 142 delete %p\n", (void*)io_block[0].iov_base);
-    printf("in Channel.cpp 143 delete %p\n", (void*)io_block);
     delete[] (char *)(io_block[0].iov_base);
     delete[] io_block;
 }
@@ -261,7 +258,6 @@ void Channel::Destroy(std::shared_ptr<Channel> channel)
 {
     channel->self_.reset();
     while (channel.use_count() > 2);
-    printf("in Channel.cpp 264 delete %p\n", (void*)channel.get());
     // printf("delete, usecount is %d\n",channel.use_count());
 }
 
@@ -387,6 +383,7 @@ void Channel::DefaultEventfdReadEventHandler()
     if (!read_buffer_.Read(fd_)) {
         // 读取全部内容到reaad_buffer
         // printf("对方已关闭连接!\n");
+        printf("close channel:%p\n",this);
         Close();
         return;
     }
@@ -395,6 +392,7 @@ void Channel::DefaultEventfdReadEventHandler()
         if (!communicate_callback_(read_buffer_.GetData(), read_buffer_.GetLen())) {
             // 粘包
             // printf("Tcp粘包!\n");
+            printf("communicate channel:%p\n",this);
             SetEvents(EPOLLIN | EPOLLONESHOT | EPOLLRDHUP);
 
             return;
@@ -455,7 +453,6 @@ void Channel::DefaultTimerfdReadEventHandler()
     SetEvents(EPOLLIN | EPOLLONESHOT | EPOLLRDHUP | EPOLLET);
     for (int i = 0; i < expired_timers.size(); i++) {
         if (!expired_timers[i]->IsAlive()) {
-            printf("in Channel.cpp 458 delete %p\n", (void*)expired_timers[i]);
             // printf("delete timer!!!!!\n");
             delete expired_timers[i];
         } else {
@@ -464,7 +461,6 @@ void Channel::DefaultTimerfdReadEventHandler()
                 this->GetLoop()->InsertTimer(expired_timers[i]);
             } else {
                 // printf("delete timer!\n");
-                printf("in Channel.cpp 467 delete %p\n", (void*)expired_timers[i]);
                 delete expired_timers[i];
             }
         }
@@ -473,6 +469,7 @@ void Channel::DefaultTimerfdReadEventHandler()
 
 void Channel::DefaultEventfdWriteEventHandler()
 {
+    printf("write channel:%p\n",this);
     if (write_callback_) {
         // iov_base第一个字节用于标识该段char*由谁删除,1表示需要在这里删除
         struct iovec *write_iovec;
@@ -499,8 +496,7 @@ void Channel::DefaultEventfdWriteEventHandler()
         }
         if (!Send(write_iovec + 1, write_iovec[0].iov_len - 1)) {
             // 错误关闭
-
-            printf("in Channel.cpp 503 delete %p\n", (void*)write_iovec);
+            printf("write error channel:%p\n",this);
             delete[] write_iovec;
             if (write_iovec_) {
                 ProcessIovec(write_iovec_);
@@ -511,7 +507,6 @@ void Channel::DefaultEventfdWriteEventHandler()
             return;
         }
 
-        printf("in Channel.cpp 514 delete %p\n", (void*)write_iovec);
         delete[] write_iovec;
 
         if (write_flag_) {
