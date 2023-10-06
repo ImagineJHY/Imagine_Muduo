@@ -316,7 +316,7 @@ bool Channel::Send(struct iovec *data, int len)
 
 Channel::~Channel()
 {
-    // printf("remove channel!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
+    printf("remove channel!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!%p\n", this);
 }
 
 void Channel::HandleEvent()
