@@ -310,7 +310,7 @@ bool Channel::Send(struct iovec *data, int len)
     }
 }
 
-Channel::~Channel()
+Channel::~Channel() noexcept
 {
     printf("remove channel!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!%p\n", this);
 }
