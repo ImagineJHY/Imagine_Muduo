@@ -32,6 +32,7 @@ class Buffer
             int bytes_num = recv(fd, temp_buf, 1000, 0);
             // printf("bytes_num : %d\n",bytes_num);
             if (bytes_num == -1) {
+                printf("in buffer.h 36 delete %p\n", (void*)temp_buf);
                 delete[] temp_buf;
                 if (errno == EAGAIN || errno == EWOULDBLOCK) {
                     // printf("数据读取完毕!\n");
@@ -41,6 +42,7 @@ class Buffer
                 return false;
             } else if (bytes_num == 0) {
                 // 对方关闭连接
+                printf("in buffer.h 45 delete %p\n", (void*)temp_buf);
                 delete[] temp_buf;
 
                 // printf("对方关闭连接!\n");
@@ -48,6 +50,7 @@ class Buffer
             }
 
             append(temp_buf, bytes_num);
+            printf("in buffer.h 53 delete %p\n", (void*)temp_buf);
             delete[] temp_buf;
         }
         // printf("num:%d\n",write_idx-read_idx);
