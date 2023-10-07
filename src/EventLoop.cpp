@@ -11,7 +11,7 @@ using namespace Imagine_Muduo;
 long long Timer::id_ = 0;
 
 EventLoop::EventLoop(int port, int max_channel, EventCallback read_cb, EventCallback write_cb, EventCommunicateCallback communicate_cb)
-                 : max_channel_num_(max_channel), channel_num_(0), quit_(0), read_callback_(read_cb), write_callback_(write_cb), communicate_callback_(communicate_cb), epoll_(new EpollPoller(this)), timer_channel_(Channel::Create(this, 0, 2)), listen_channel_(Channel::Create(this, port, 0))
+                 : quit_(0), channel_num_(0), max_channel_num_(max_channel), read_callback_(read_cb), write_callback_(write_cb), communicate_callback_(communicate_cb), epoll_(new EpollPoller(this)), listen_channel_(Channel::Create(this, port, 0)), timer_channel_(Channel::Create(this, 0, 2))
 {
     try {
         pool_ = new ThreadPool<std::shared_ptr<Channel>>(10, max_channel); // 初始化线程池

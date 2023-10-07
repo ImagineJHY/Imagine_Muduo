@@ -83,12 +83,12 @@ class EventLoop
     std::list<std::shared_ptr<Channel>> close_list_;
     pthread_t *destroy_thread_;
     pthread_mutex_t destroy_lock_;
-    Poller *epoll_;
     int channel_num_;           // 当前连接的客户端数目
     int max_channel_num_;       // 最多能接收的客户端数目
     EventCallback read_callback_;
     EventCallback write_callback_;
     EventCommunicateCallback communicate_callback_ = nullptr;
+    Poller *epoll_;
     // vector<Channel*> channels_;
     std::shared_ptr<Channel> listen_channel_;
 

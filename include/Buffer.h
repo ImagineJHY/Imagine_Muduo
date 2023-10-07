@@ -60,7 +60,7 @@ class Buffer
         return true;
     }
 
-    ssize_t Write(int fd)
+    int Write(int fd)
     {
         printf("this is write func!\n");
         write(fd, &(buf_[read_idx_]), write_idx_ - read_idx_);
@@ -68,7 +68,7 @@ class Buffer
         return 0;
     }
 
-    void append(const char *data, size_t len)
+    void append(const char *data, int len)
     {
         EnsureWritableBytes(len);
         for (int i = 0; i < len; i++) {
@@ -77,7 +77,7 @@ class Buffer
         write_idx_ += len;
     }
 
-    std::string RetrieveAsString(size_t len)
+    std::string RetrieveAsString(int len)
     {
         if (write_idx_ - read_idx_ < len) {
             return nullptr;
@@ -104,7 +104,7 @@ class Buffer
         return temp_string;
     }
 
-    void EnsureWritableBytes(size_t len)
+    void EnsureWritableBytes(int len)
     {
         if (total_size_ - write_idx_ < len) {
             if (total_size_ - write_idx_ + read_idx_ < len) {

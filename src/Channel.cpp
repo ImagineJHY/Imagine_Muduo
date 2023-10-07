@@ -275,7 +275,7 @@ void Channel::Close()
 bool Channel::Send(struct iovec *data, int len)
 {
     int send_id = 0;
-    int send_num;
+    ssize_t send_num;
     while (1) {
         send_num = writev(fd_, data, len);
         if (send_num <= -1) {
@@ -289,11 +289,11 @@ bool Channel::Send(struct iovec *data, int len)
             return false;
         }
 
-        if (send_num < data[send_id].iov_len) {
+        if (send_num < static_cast<ssize_t>(data[send_id].iov_len)) {
             data[send_id].iov_base = (char *)(data[send_id].iov_base) + send_num;
             data[send_id].iov_len -= send_num;
         } else {
-            int num = data[send_id].iov_len;
+            ssize_t num = static_cast<ssize_t>(data[send_id].iov_len);
             while (send_num > num) {
                 data[send_id++].iov_len = 0;
                 send_num -= num;
@@ -354,8 +354,8 @@ void Channel::DefaultEventHandler()
 void Channel::DefaultListenfdReadEventHandler()
 {
 
-    struct sockaddr_in client_addr;
-    socklen_t client_addr_len = sizeof(client_addr);
+    // struct sockaddr_in client_addr;
+    // socklen_t client_addr_len = sizeof(client_addr);
 
     EventLoop *loop = this->GetLoop();
     if (loop->GetChannelnum() >= loop->GetMaxchannelnum()) {
@@ -451,7 +451,7 @@ void Channel::DefaultTimerfdReadEventHandler()
     std::vector<Timer *> expired_timers = this->GetLoop()->GetExpiredTimers(now);
     // printf("expired num is %d\n",expired_timers.size());
     SetEvents(EPOLLIN | EPOLLONESHOT | EPOLLRDHUP | EPOLLET);
-    for (int i = 0; i < expired_timers.size(); i++) {
+    for (size_t i = 0; i < expired_timers.size(); i++) {
         if (!expired_timers[i]->IsAlive()) {
             // printf("delete timer!!!!!\n");
             delete expired_timers[i];
@@ -533,16 +533,22 @@ void Channel::DefaultEventfdWriteEventHandler()
 bool Channel::SetEventHandler(EventHandler handler)
 {
     this->handler_ = handler;
+
+    return true;
 }
 
 bool Channel::SetReadEventHandler(EventHandler read_handler)
 {
     this->read_handler_ = read_handler;
+
+    return true;
 }
 
 bool Channel::SetWriteEventHandler(EventHandler write_handler)
 {
     this->write_handler_ = write_handler;
+
+    return true;
 }
 
 // bool Channel::Process(){

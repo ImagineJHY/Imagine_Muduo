@@ -36,7 +36,7 @@ class ThreadPool
 };
 
 template <typename T>
-ThreadPool<T>::ThreadPool(int thread_num, int max_request) : thread_num_(thread_num), max_request_(max_request), threads_(nullptr), quit_(0)
+ThreadPool<T>::ThreadPool(int thread_num, int max_request) : thread_num_(thread_num), max_request_(max_request), quit_(0), threads_(nullptr)
 {
     if (thread_num < 0 || max_request < 0) {
         throw std::exception();
@@ -81,7 +81,7 @@ ThreadPool<T>::~ThreadPool()
 template <typename T>
 void ThreadPool<T>::PutTask(T task)
 {
-    if (tasks_.size() < max_request_) {
+    if (tasks_.size() < static_cast<size_t>(max_request_)) {
         pthread_mutex_lock(&lock_);
         tasks_.push_back(task);
         // printf("I put a task!\n");
@@ -112,6 +112,8 @@ T ThreadPool<T>::GetTask()
 
         return task;
     }
+
+    return nullptr;
 }
 
 template <typename T>
