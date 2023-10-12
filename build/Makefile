@@ -111,30 +111,17 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named build
+# Target rules for targets named prepare
 
 # Build rule for target.
-build: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 build
-.PHONY : build
+prepare: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 prepare
+.PHONY : prepare
 
 # fast build rule for target.
-build/fast:
-	$(MAKE) -f CMakeFiles/build.dir/build.make CMakeFiles/build.dir/build
-.PHONY : build/fast
-
-#=============================================================================
-# Target rules for targets named init
-
-# Build rule for target.
-init: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 init
-.PHONY : init
-
-# fast build rule for target.
-init/fast:
-	$(MAKE) -f CMakeFiles/init.dir/build.make CMakeFiles/init.dir/build
-.PHONY : init/fast
+prepare/fast:
+	$(MAKE) -f CMakeFiles/prepare.dir/build.make CMakeFiles/prepare.dir/build
+.PHONY : prepare/fast
 
 #=============================================================================
 # Target rules for targets named imagine_muduo
@@ -150,17 +137,43 @@ imagine_muduo/fast:
 .PHONY : imagine_muduo/fast
 
 #=============================================================================
-# Target rules for targets named prepare
+# Target rules for targets named init
 
 # Build rule for target.
-prepare: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 prepare
-.PHONY : prepare
+init: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 init
+.PHONY : init
 
 # fast build rule for target.
-prepare/fast:
-	$(MAKE) -f CMakeFiles/prepare.dir/build.make CMakeFiles/prepare.dir/build
-.PHONY : prepare/fast
+init/fast:
+	$(MAKE) -f CMakeFiles/init.dir/build.make CMakeFiles/init.dir/build
+.PHONY : init/fast
+
+#=============================================================================
+# Target rules for targets named imagine_muduo_static
+
+# Build rule for target.
+imagine_muduo_static: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 imagine_muduo_static
+.PHONY : imagine_muduo_static
+
+# fast build rule for target.
+imagine_muduo_static/fast:
+	$(MAKE) -f CMakeFiles/imagine_muduo_static.dir/build.make CMakeFiles/imagine_muduo_static.dir/build
+.PHONY : imagine_muduo_static/fast
+
+#=============================================================================
+# Target rules for targets named build
+
+# Build rule for target.
+build: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 build
+.PHONY : build
+
+# fast build rule for target.
+build/fast:
+	$(MAKE) -f CMakeFiles/build.dir/build.make CMakeFiles/build.dir/build
+.PHONY : build/fast
 
 #=============================================================================
 # Target rules for targets named prepare_submodule
@@ -195,6 +208,7 @@ src/Channel.o: src/Channel.cpp.o
 # target to build an object file
 src/Channel.cpp.o:
 	$(MAKE) -f CMakeFiles/imagine_muduo.dir/build.make CMakeFiles/imagine_muduo.dir/src/Channel.cpp.o
+	$(MAKE) -f CMakeFiles/imagine_muduo_static.dir/build.make CMakeFiles/imagine_muduo_static.dir/src/Channel.cpp.o
 .PHONY : src/Channel.cpp.o
 
 src/Channel.i: src/Channel.cpp.i
@@ -204,6 +218,7 @@ src/Channel.i: src/Channel.cpp.i
 # target to preprocess a source file
 src/Channel.cpp.i:
 	$(MAKE) -f CMakeFiles/imagine_muduo.dir/build.make CMakeFiles/imagine_muduo.dir/src/Channel.cpp.i
+	$(MAKE) -f CMakeFiles/imagine_muduo_static.dir/build.make CMakeFiles/imagine_muduo_static.dir/src/Channel.cpp.i
 .PHONY : src/Channel.cpp.i
 
 src/Channel.s: src/Channel.cpp.s
@@ -213,6 +228,7 @@ src/Channel.s: src/Channel.cpp.s
 # target to generate assembly for a file
 src/Channel.cpp.s:
 	$(MAKE) -f CMakeFiles/imagine_muduo.dir/build.make CMakeFiles/imagine_muduo.dir/src/Channel.cpp.s
+	$(MAKE) -f CMakeFiles/imagine_muduo_static.dir/build.make CMakeFiles/imagine_muduo_static.dir/src/Channel.cpp.s
 .PHONY : src/Channel.cpp.s
 
 src/EventLoop.o: src/EventLoop.cpp.o
@@ -222,6 +238,7 @@ src/EventLoop.o: src/EventLoop.cpp.o
 # target to build an object file
 src/EventLoop.cpp.o:
 	$(MAKE) -f CMakeFiles/imagine_muduo.dir/build.make CMakeFiles/imagine_muduo.dir/src/EventLoop.cpp.o
+	$(MAKE) -f CMakeFiles/imagine_muduo_static.dir/build.make CMakeFiles/imagine_muduo_static.dir/src/EventLoop.cpp.o
 .PHONY : src/EventLoop.cpp.o
 
 src/EventLoop.i: src/EventLoop.cpp.i
@@ -231,6 +248,7 @@ src/EventLoop.i: src/EventLoop.cpp.i
 # target to preprocess a source file
 src/EventLoop.cpp.i:
 	$(MAKE) -f CMakeFiles/imagine_muduo.dir/build.make CMakeFiles/imagine_muduo.dir/src/EventLoop.cpp.i
+	$(MAKE) -f CMakeFiles/imagine_muduo_static.dir/build.make CMakeFiles/imagine_muduo_static.dir/src/EventLoop.cpp.i
 .PHONY : src/EventLoop.cpp.i
 
 src/EventLoop.s: src/EventLoop.cpp.s
@@ -240,6 +258,7 @@ src/EventLoop.s: src/EventLoop.cpp.s
 # target to generate assembly for a file
 src/EventLoop.cpp.s:
 	$(MAKE) -f CMakeFiles/imagine_muduo.dir/build.make CMakeFiles/imagine_muduo.dir/src/EventLoop.cpp.s
+	$(MAKE) -f CMakeFiles/imagine_muduo_static.dir/build.make CMakeFiles/imagine_muduo_static.dir/src/EventLoop.cpp.s
 .PHONY : src/EventLoop.cpp.s
 
 src/Poller.o: src/Poller.cpp.o
@@ -249,6 +268,7 @@ src/Poller.o: src/Poller.cpp.o
 # target to build an object file
 src/Poller.cpp.o:
 	$(MAKE) -f CMakeFiles/imagine_muduo.dir/build.make CMakeFiles/imagine_muduo.dir/src/Poller.cpp.o
+	$(MAKE) -f CMakeFiles/imagine_muduo_static.dir/build.make CMakeFiles/imagine_muduo_static.dir/src/Poller.cpp.o
 .PHONY : src/Poller.cpp.o
 
 src/Poller.i: src/Poller.cpp.i
@@ -258,6 +278,7 @@ src/Poller.i: src/Poller.cpp.i
 # target to preprocess a source file
 src/Poller.cpp.i:
 	$(MAKE) -f CMakeFiles/imagine_muduo.dir/build.make CMakeFiles/imagine_muduo.dir/src/Poller.cpp.i
+	$(MAKE) -f CMakeFiles/imagine_muduo_static.dir/build.make CMakeFiles/imagine_muduo_static.dir/src/Poller.cpp.i
 .PHONY : src/Poller.cpp.i
 
 src/Poller.s: src/Poller.cpp.s
@@ -267,6 +288,7 @@ src/Poller.s: src/Poller.cpp.s
 # target to generate assembly for a file
 src/Poller.cpp.s:
 	$(MAKE) -f CMakeFiles/imagine_muduo.dir/build.make CMakeFiles/imagine_muduo.dir/src/Poller.cpp.s
+	$(MAKE) -f CMakeFiles/imagine_muduo_static.dir/build.make CMakeFiles/imagine_muduo_static.dir/src/Poller.cpp.s
 .PHONY : src/Poller.cpp.s
 
 src/TimeUtil.o: src/TimeUtil.cpp.o
@@ -276,6 +298,7 @@ src/TimeUtil.o: src/TimeUtil.cpp.o
 # target to build an object file
 src/TimeUtil.cpp.o:
 	$(MAKE) -f CMakeFiles/imagine_muduo.dir/build.make CMakeFiles/imagine_muduo.dir/src/TimeUtil.cpp.o
+	$(MAKE) -f CMakeFiles/imagine_muduo_static.dir/build.make CMakeFiles/imagine_muduo_static.dir/src/TimeUtil.cpp.o
 .PHONY : src/TimeUtil.cpp.o
 
 src/TimeUtil.i: src/TimeUtil.cpp.i
@@ -285,6 +308,7 @@ src/TimeUtil.i: src/TimeUtil.cpp.i
 # target to preprocess a source file
 src/TimeUtil.cpp.i:
 	$(MAKE) -f CMakeFiles/imagine_muduo.dir/build.make CMakeFiles/imagine_muduo.dir/src/TimeUtil.cpp.i
+	$(MAKE) -f CMakeFiles/imagine_muduo_static.dir/build.make CMakeFiles/imagine_muduo_static.dir/src/TimeUtil.cpp.i
 .PHONY : src/TimeUtil.cpp.i
 
 src/TimeUtil.s: src/TimeUtil.cpp.s
@@ -294,6 +318,7 @@ src/TimeUtil.s: src/TimeUtil.cpp.s
 # target to generate assembly for a file
 src/TimeUtil.cpp.s:
 	$(MAKE) -f CMakeFiles/imagine_muduo.dir/build.make CMakeFiles/imagine_muduo.dir/src/TimeUtil.cpp.s
+	$(MAKE) -f CMakeFiles/imagine_muduo_static.dir/build.make CMakeFiles/imagine_muduo_static.dir/src/TimeUtil.cpp.s
 .PHONY : src/TimeUtil.cpp.s
 
 # Help Target
@@ -303,11 +328,12 @@ help:
 	@echo "... clean"
 	@echo "... depend"
 	@echo "... rebuild_cache"
-	@echo "... edit_cache"
-	@echo "... build"
-	@echo "... init"
-	@echo "... imagine_muduo"
 	@echo "... prepare"
+	@echo "... imagine_muduo"
+	@echo "... init"
+	@echo "... imagine_muduo_static"
+	@echo "... build"
+	@echo "... edit_cache"
 	@echo "... prepare_submodule"
 	@echo "... system_prepare"
 	@echo "... src/Channel.o"
