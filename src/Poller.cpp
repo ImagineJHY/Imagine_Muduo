@@ -1,11 +1,12 @@
-#include "Poller.h"
+#include "Imagine_Muduo/Poller.h"
 
 #include <memory>
 
-#include "EventLoop.h"
-#include "Channel.h"
+#include "Imagine_Muduo/EventLoop.h"
+#include "Imagine_Muduo/Channel.h"
 
-using namespace Imagine_Muduo;
+namespace Imagine_Muduo
+{
 
 EpollPoller::EpollPoller(EventLoop *loop)
 {
@@ -24,7 +25,7 @@ void EpollPoller::poll(int timeoutMs, std::vector<std::shared_ptr<Channel>> *act
     int events_num = epoll_wait(epollfd_, events_set, channel_num_, timeoutMs);
     // printf("stop waiting...\n");
     if (events_num < 0 || errno == EINTR) {
-        printf("poll exception!\n");
+        LOG_INFO("poll exception!");
         throw std::exception();
     }
 
@@ -33,7 +34,7 @@ void EpollPoller::poll(int timeoutMs, std::vector<std::shared_ptr<Channel>> *act
         std::shared_ptr<Channel> temp_channel = channels_.find(events_set[i].data.fd)->second;
         pthread_mutex_unlock(&hashmap_lock_);
         if (!temp_channel) {
-            printf("poll exception!\n");
+            LOG_INFO("poll exception!");
             throw std::exception();
         }
         temp_channel->SetRevents(events_set[i].events);
@@ -83,7 +84,7 @@ std::shared_ptr<Channel> EpollPoller::FindChannel(int fd)
     std::shared_ptr<Channel> temp_channel;
     if (it == channels_.end()) {
         // 重复删除
-        printf("delete already!\n");
+        LOG_INFO("delete already!");
     } else {
         temp_channel = it->second;
     }
@@ -91,3 +92,5 @@ std::shared_ptr<Channel> EpollPoller::FindChannel(int fd)
 
     return temp_channel;
 }
+
+} // namespace Imagine_Muduo

@@ -7,15 +7,13 @@
 #include <sys/socket.h>
 #include <functional>
 
-#include "Callbacks.h"
+#include "Imagine_Muduo/Callbacks.h"
 
 namespace Imagine_Muduo
 {
 
 class Buffer
 {
-    // public:
-    //     using EventCommunicateCallback=std::function<bool(const char*,int)>;//粘包判断函数
  public:
     Buffer(int buffer_size = 1000)
     {
@@ -27,7 +25,7 @@ class Buffer
 
     ~Buffer()
     {
-        printf("!!!!!!!!!!!!!!!!!!!!!remove buffer:%p\n", this);
+        LOG_INFO("!!!!!!!!!!!!!!!!!!!!!remove buffer:%p", this);
     }
 
     bool Read(int fd, EventCommunicateCallback callback = nullptr)
@@ -62,7 +60,7 @@ class Buffer
 
     int Write(int fd)
     {
-        printf("this is write func!\n");
+        LOG_INFO("this is write func!");
         write(fd, &(buf_[read_idx_]), write_idx_ - read_idx_);
 
         return 0;

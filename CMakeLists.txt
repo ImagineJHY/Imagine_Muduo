@@ -1,8 +1,10 @@
 cmake_minimum_required(VERSION 3.0)
 project(IMAGINE_MUDUO)
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g  -std=c++11 -Wall -Werror")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -std=c++11 -Wall -Werror")
+# set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g  -std=c++11 -Wall -Werror")
+# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -std=c++11 -Wall -Werror")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g  -std=c++11")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -std=c++11")
 
 # 定义全局参数 IS_MAKE_PROJECT
 # 若已定义，则当前project作为subModule
@@ -55,4 +57,8 @@ endif()
 file(GLOB IMAGINE_MUDUO_SRC_LIST ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
 add_library(imagine_muduo SHARED ${IMAGINE_MUDUO_SRC_LIST})
 target_include_directories(imagine_muduo PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
-target_link_libraries(imagine_muduo pthread)
+target_link_libraries(imagine_muduo pthread imagine_log imagine_time)
+
+if(TARGET imagine_tool)
+    add_dependencies(imagine_muduo imagine_tool)
+endif()

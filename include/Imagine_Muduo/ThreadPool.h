@@ -28,7 +28,7 @@ class ThreadPool
  private:
     int thread_num_;
     int max_request_;
-    int quit_ = 0;
+    bool quit_;
     pthread_t *threads_;
     std::list<T> tasks_;
     pthread_mutex_t lock_;
@@ -36,7 +36,7 @@ class ThreadPool
 };
 
 template <typename T>
-ThreadPool<T>::ThreadPool(int thread_num, int max_request) : thread_num_(thread_num), max_request_(max_request), quit_(0), threads_(nullptr)
+ThreadPool<T>::ThreadPool(int thread_num, int max_request) : thread_num_(thread_num), max_request_(max_request), quit_(false), threads_(nullptr)
 {
     if (thread_num < 0 || max_request < 0) {
         throw std::exception();
@@ -56,7 +56,7 @@ ThreadPool<T>::ThreadPool(int thread_num, int max_request) : thread_num_(thread_
     }
 
     for (int i = 0; i < thread_num; i++) {
-        printf("create pthread %d ...\n", i);
+        LOG_INFO("create pthread %d ...", i);
         if (pthread_create(threads_ + i, nullptr, Worker, this) != 0) {
             delete[] threads_;
             throw std::exception();

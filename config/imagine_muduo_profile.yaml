@@ -1,0 +1,6 @@
+thread_num: 5
+max_channel_num: 10000
+port: 9999
+imagine_log_prifile_name: imagine_log_profile.yaml
+imagine_log_profile_path: /home/imagine/MIT6824/Imagine_Muduo/config/
+imagine_log_with_singleton_mode: false

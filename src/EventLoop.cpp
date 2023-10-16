@@ -1,17 +1,102 @@
-#include "EventLoop.h"
+#include "Imagine_Muduo/EventLoop.h"
 
 #include <memory>
 
-#include "Channel.h"
-#include "Poller.h"
-#include "ThreadPool.h"
+#include "Imagine_Muduo/Channel.h"
+#include "Imagine_Muduo/Poller.h"
+#include "Imagine_Muduo/ThreadPool.h"
 
-using namespace Imagine_Muduo;
+namespace Imagine_Muduo
+{
 
-long long Timer::id_ = 0;
+// long long Imagine_Tool::Timer::id_ = 0;
 
-EventLoop::EventLoop(int port, int max_channel, EventCallback read_cb, EventCallback write_cb, EventCommunicateCallback communicate_cb)
-                 : quit_(0), channel_num_(0), max_channel_num_(max_channel), read_callback_(read_cb), write_callback_(write_cb), communicate_callback_(communicate_cb), epoll_(new EpollPoller(this)), listen_channel_(Channel::Create(this, port, 0)), timer_channel_(Channel::Create(this, 0, 2))
+EventLoop::EventLoop()
+            : quit_(0), epoll_(new EpollPoller(this)), timer_channel_(Channel::Create(this, 0, Channel::ChannelTyep::TimerChannel))
+{
+
+}
+
+EventLoop::EventLoop(std::string profile_path)
+            : quit_(0), epoll_(new EpollPoller(this)), timer_channel_(Channel::Create(this, 0, Channel::ChannelTyep::TimerChannel))
+{
+    Init(profile_path);
+}
+
+void EventLoop::Init(std::string profile_path)
+{
+    if (profile_path == "") {
+        throw std::exception();
+    }
+
+    YAML::Node config = YAML::LoadFile(profile_path);
+    thread_num_ = config["thread_num"].as<size_t>();
+    max_channel_num_ = config["max_channel_num"].as<size_t>();
+    port_ = config["port"].as<size_t>();
+    imagine_log_prifile_name_ = config["imagine_log_prifile_name"].as<std::string>();
+    imagine_log_profile_path_ = config["imagine_log_profile_path"].as<std::string>();
+    is_singleton_log_mode_ = config["imagine_log_with_singleton_mode"].as<bool>();
+
+    if (is_singleton_log_mode_) {
+        logger_ = Imagine_Tool::SingletonLogger::GetInstance();
+    } else {
+        logger_ = new Imagine_Tool::NonSingletonLogger();
+        Imagine_Tool::Logger::SetInstance(logger_);
+    }
+
+    logger_->Init(imagine_log_profile_path_ + imagine_log_prifile_name_);
+
+    destroy_thread_ = new pthread_t;
+    if (!destroy_thread_) {
+        throw std::exception();
+    }
+
+    if (pthread_mutex_init(&destroy_lock_, nullptr) != 0) {
+        throw std::exception();
+    }
+
+    if (pthread_mutex_init(&timer_lock_, nullptr) != 0) {
+        throw std::exception();
+    }
+
+    if (pthread_mutex_init(&timer_map_lock_, nullptr) != 0) {
+        throw std::exception();
+    }
+
+}
+
+EventLoop::EventLoop(std::string port, int thread_num, int max_channel, EventCallback read_cb, EventCallback write_cb, EventCommunicateCallback communicate_cb)
+                : quit_(0), channel_num_(0), max_channel_num_(max_channel), read_callback_(read_cb), write_callback_(write_cb), communicate_callback_(communicate_cb), epoll_(new EpollPoller(this)), listen_channel_(Channel::Create(this, atoi(&port[0]), Channel::ChannelTyep::ListenChannel)), timer_channel_(Channel::Create(this, 0, Channel::ChannelTyep::TimerChannel))
+{
+    try {
+        pool_ = new ThreadPool<std::shared_ptr<Channel>>(thread_num, max_channel); // 初始化线程池
+    } catch (...) {
+        throw std::exception();
+    }
+
+    destroy_thread_ = new pthread_t;
+    if (!destroy_thread_) {
+        throw std::exception();
+    }
+
+    if (pthread_mutex_init(&destroy_lock_, nullptr) != 0) {
+        throw std::exception();
+    }
+
+    if (pthread_mutex_init(&timer_lock_, nullptr) != 0) {
+        throw std::exception();
+    }
+
+    if (pthread_mutex_init(&timer_map_lock_, nullptr) != 0) {
+        throw std::exception();
+    }
+
+    epoll_->AddChannel(timer_channel_);
+    epoll_->AddChannel(listen_channel_); // 创建监听套接字并添加到epoll
+}
+
+EventLoop::EventLoop(int port, int thread_num, int max_channel, EventCallback read_cb, EventCallback write_cb, EventCommunicateCallback communicate_cb)
+                 : quit_(0), channel_num_(0), max_channel_num_(max_channel), read_callback_(read_cb), write_callback_(write_cb), communicate_callback_(communicate_cb), epoll_(new EpollPoller(this)), listen_channel_(Channel::Create(this, port, Channel::ChannelTyep::ListenChannel)), timer_channel_(Channel::Create(this, 0, Channel::ChannelTyep::TimerChannel))
 {
     try {
         pool_ = new ThreadPool<std::shared_ptr<Channel>>(10, max_channel); // 初始化线程池
@@ -60,7 +145,7 @@ void EventLoop::loop()
             },
             this) != 0) {
         delete[] destroy_thread_;
-        printf("loop exception!\n");
+        LOG_INFO("loop exception!");
         throw std::exception();
     }
 
@@ -85,6 +170,34 @@ void EventLoop::loop()
 int EventLoop::GetChannelnum()
 {
     return channel_num_;
+}
+
+bool EventLoop::AddListenChannel(std::string port)
+{
+    Channel::Create(this, atoi(&port[0]), Channel::ChannelTyep::ListenChannel);
+
+    return true;
+}
+
+bool EventLoop::AddListenChannel(int port)
+{
+    Channel::Create(this, port, Channel::ChannelTyep::ListenChannel);
+
+    return true;
+}
+
+bool EventLoop::AddEventChannel(std::string port)
+{
+    Channel::Create(this, atoi(&port[0]), Channel::ChannelTyep::EventChannel);
+
+    return true;
+}
+
+bool EventLoop::AddEventChannel(int port)
+{
+    Channel::Create(this, port, Channel::ChannelTyep::EventChannel);
+
+    return true;
 }
 
 void EventLoop::AddChannelnum()
@@ -165,18 +278,18 @@ void EventLoop::DestroyClosedChannel()
     }
 }
 
-long long EventLoop::SetTimer(TimerCallback timer_callback, double interval, double delay)
+long long EventLoop::SetTimer(Imagine_Tool::TimerCallback timer_callback, double interval, double delay)
 {
     if (interval == 0 && delay == 0) {
         return false;
     }
-    TimeStamp new_time;
+    Imagine_Tool::TimeStamp new_time;
     if (delay) {
-        new_time.SetTime(TimeUtil::MicroSecondsAddSeconds(TimeUtil::GetNow(), delay));
+        new_time.SetTime(Imagine_Tool::TimeUtil::MicroSecondsAddSeconds(Imagine_Tool::TimeUtil::GetNow(), delay));
     } else {
-        new_time.SetTime(TimeUtil::MicroSecondsAddSeconds(TimeUtil::GetNow(), interval));
+        new_time.SetTime(Imagine_Tool::TimeUtil::MicroSecondsAddSeconds(Imagine_Tool::TimeUtil::GetNow(), interval));
     }
-    Timer *new_timer = new Timer(new_time, timer_callback, interval);
+    Imagine_Tool::Timer *new_timer = new Imagine_Tool::Timer(new_time, timer_callback, interval);
     // printf("now is %lld\nnew is %lld\n",TimeUtil::GetNow(),new_timer->GetCallTime().GetTime());
     InsertTimer(new_timer);
 
@@ -187,7 +300,7 @@ bool EventLoop::CloseTimer(long long timer_id)
 {
     pthread_mutex_lock(&timer_map_lock_);
     // printf("timerid is %lld\n",timer_id);
-    std::unordered_map<long long, Timer *>::iterator it = timer_map_.find(timer_id);
+    std::unordered_map<long long, Imagine_Tool::Timer *>::iterator it = timer_map_.find(timer_id);
     if (it == timer_map_.end()) {
         throw std::exception();
     }
@@ -198,13 +311,13 @@ bool EventLoop::CloseTimer(long long timer_id)
     return true;
 }
 
-bool EventLoop::InsertTimer(Timer *timer)
+bool EventLoop::InsertTimer(Imagine_Tool::Timer *timer)
 {
     pthread_mutex_lock(&timer_lock_);
     timers_.push(timer);
     if (timers_.top() == timer) {
         // printf("now is %lld\nnew is %lld\n",TimeUtil::GetNow(),timers_.top()->GetCallTime().GetTime());
-        TimeUtil::ResetTimerfd(timer_channel_->Getfd(), timers_.top()->GetCallTime());
+        Imagine_Tool::TimeUtil::ResetTimerfd(timer_channel_->Getfd(), timers_.top()->GetCallTime());
     }
     pthread_mutex_lock(&timer_map_lock_);
     timer_map_.insert(std::make_pair(timer->GetTimerId(), timer));
@@ -214,11 +327,11 @@ bool EventLoop::InsertTimer(Timer *timer)
     return true;
 }
 
-std::vector<Timer *> EventLoop::GetExpiredTimers(const TimeStamp &now)
+std::vector<Imagine_Tool::Timer *> EventLoop::GetExpiredTimers(const Imagine_Tool::TimeStamp &now)
 {
-    std::vector<Timer *> expired_timers;
+    std::vector<Imagine_Tool::Timer *> expired_timers;
     pthread_mutex_lock(&timer_lock_);
-    Timer *top_timer = timers_.top();
+    Imagine_Tool::Timer *top_timer = timers_.top();
     // 比较绝对时间
     while (timers_.size() && (top_timer->GetCallTime().GetTime()) < (now.GetTime())) {
         expired_timers.push_back(top_timer);
@@ -226,11 +339,13 @@ std::vector<Timer *> EventLoop::GetExpiredTimers(const TimeStamp &now)
         top_timer = timers_.top();
     }
     if (timers_.size()) {
-        TimeUtil::ResetTimerfd(timer_channel_->Getfd(), timers_.top()->GetCallTime());
+        Imagine_Tool::TimeUtil::ResetTimerfd(timer_channel_->Getfd(), timers_.top()->GetCallTime());
     } else {
-        TimeUtil::SetDefaultTimerfd(timer_channel_->Getfd());
+        Imagine_Tool::TimeUtil::SetDefaultTimerfd(timer_channel_->Getfd());
     }
     pthread_mutex_unlock(&timer_lock_);
 
     return expired_timers;
 }
+
+} // namespace Imagine_Muduo

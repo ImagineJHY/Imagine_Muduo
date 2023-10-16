@@ -10,8 +10,8 @@
 #include <fcntl.h>
 #include <algorithm>
 
-#include "EventLoop.h"
-#include "Buffer.h"
+#include "Imagine_Muduo/EventLoop.h"
+#include "Imagine_Muduo/Buffer.h"
 
 namespace Imagine_Muduo
 {
@@ -21,11 +21,12 @@ class Buffer;
 
 class Channel
 {
-
-    // public:
-    //     using EventHandler=std::function<void()>;
-    //     using EventCallback=std::function<struct iovec*(const struct iovec*)>;
-    //     using EventCommunicateCallback=std::function<bool(const char*,int)>;//粘包判断函数
+ public:
+   enum ChannelTyep{
+      ListenChannel,
+      EventChannel,
+      TimerChannel
+   };
 
  public:
     // Channel();
@@ -87,7 +88,7 @@ class Channel
 
     static void SetNonBlocking(int fd);
 
-    static std::shared_ptr<Channel> Create(EventLoop *loop, int value, int type = 1);
+    static std::shared_ptr<Channel> Create(EventLoop *loop, int value, ChannelTyep type = EventChannel);
 
     static void Destroy(std::shared_ptr<Channel> channel);
 
