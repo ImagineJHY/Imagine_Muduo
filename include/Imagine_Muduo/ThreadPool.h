@@ -1,6 +1,8 @@
 #ifndef IMAGINE_MUDUO_THREADPOOL_H
 #define IMAGINE_MUDUO_THREADPOOL_H
 
+#include "Imagine_Log/Logger.h"
+
 #include <pthread.h>
 #include <list>
 #include <semaphore.h>
@@ -12,8 +14,6 @@ namespace Imagine_Muduo
 template <typename T>
 class ThreadPool
 {
-    // public:
-    //     int block_num=0;
  public:
     ThreadPool(int thread_num = 10, int max_request = 10000);
 
