@@ -6,7 +6,7 @@
 #include "Imagine_Log/SingletonLogger.h"
 #include "Imagine_Log/NonSingletonLogger.h"
 #include "Imagine_Muduo/ThreadPool.h"
-#include "Imagine_Muduo/Callbacks.h"
+#include "Imagine_Muduo/common_definition.h"
 
 #include <pthread.h>
 #include <vector>
@@ -32,8 +32,6 @@ class EventLoop
    EventLoop();
 
    EventLoop(std::string  profile_name);
-
-   EventLoop(std::string port, int thread_num = 10, int max_channel = 10000, EventCallback read_cb = nullptr, EventCallback write_cb = nullptr, EventCommunicateCallback communicate_cb = nullptr);
 
    EventLoop(int port, int thread_num = 10, int max_channel = 10000, EventCallback read_cb = nullptr, EventCallback write_cb = nullptr, EventCommunicateCallback communicate_cb = nullptr);
 
