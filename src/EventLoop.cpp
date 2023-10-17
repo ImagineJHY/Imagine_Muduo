@@ -17,34 +17,40 @@ EventLoop::EventLoop()
 
 }
 
-EventLoop::EventLoop(std::string profile_path)
+EventLoop::EventLoop(std::string profile_name)
             : quit_(0), epoll_(new EpollPoller(this)), timer_channel_(Channel::Create(this, 0, Channel::ChannelTyep::TimerChannel))
 {
-    Init(profile_path);
+    Init(profile_name);
 }
 
-void EventLoop::Init(std::string profile_path)
+void EventLoop::Init(std::string profile_name)
 {
-    if (profile_path == "") {
+    if (profile_name == "") {
         throw std::exception();
     }
 
-    YAML::Node config = YAML::LoadFile(profile_path);
+    YAML::Node config = YAML::LoadFile(profile_name);
+    port_ = config["port"].as<size_t>();
     thread_num_ = config["thread_num"].as<size_t>();
     max_channel_num_ = config["max_channel_num"].as<size_t>();
-    port_ = config["port"].as<size_t>();
-    imagine_log_prifile_name_ = config["imagine_log_prifile_name"].as<std::string>();
-    imagine_log_profile_path_ = config["imagine_log_profile_path"].as<std::string>();
-    is_singleton_log_mode_ = config["imagine_log_with_singleton_mode"].as<bool>();
+    log_name_ = config["log_name"].as<std::string>();
+    log_path_ = config["log_path"].as<std::string>();
+    max_log_file_size_ = config["max_log_file_size"].as<size_t>();
+    async_log_ = config["async_log"].as<bool>();
+    singleton_log_mode_ = config["singleton_log_mode"].as<bool>();
+    log_title_ = config["log_title"].as<std::string>();
+    log_with_timestamp_ = config["log_with_timestamp"].as<bool>();
 
-    if (is_singleton_log_mode_) {
+    if (singleton_log_mode_) {
         logger_ = Imagine_Tool::SingletonLogger::GetInstance();
     } else {
         logger_ = new Imagine_Tool::NonSingletonLogger();
         Imagine_Tool::Logger::SetInstance(logger_);
     }
 
-    logger_->Init(imagine_log_profile_path_ + imagine_log_prifile_name_);
+    InitProfilePath(profile_name);
+
+    logger_->Init(config);
 
     destroy_thread_ = new pthread_t;
     if (!destroy_thread_) {
@@ -129,6 +135,24 @@ EventLoop::~EventLoop()
 {
     delete pool_;
     delete epoll_;
+}
+
+void EventLoop::InitProfilePath(std::string profile_name)
+{
+    size_t idx = profile_name.find_last_of("/");
+    profile_path_ = profile_name.substr(0, idx + 1);
+    log_profile_name_ = profile_path_ + "generate_Log_profile.yaml";
+}
+
+void EventLoop::GenerateSubmoduleProfile(YAML::Node config)
+{
+    int fd = open(log_profile_name_.c_str(), O_RDWR | O_CREAT);
+    config.remove(config["port"]);
+    config.remove(config["thread_num"]);
+    config.remove(config["max_channel_num"]);
+    config.remove(config["singleton_log_mode"]);
+    write(fd, config.as<std::string>().c_str(), config.as<std::string>().size());
+    close(fd);
 }
 
 void EventLoop::loop()

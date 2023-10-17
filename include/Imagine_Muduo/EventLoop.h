@@ -31,15 +31,19 @@ class EventLoop
    // 配置文件形式初始化
    EventLoop();
 
-   EventLoop(std::string profile_path);
-
-   void Init(std::string profile_path);
+   EventLoop(std::string  profile_name);
 
    EventLoop(std::string port, int thread_num = 10, int max_channel = 10000, EventCallback read_cb = nullptr, EventCallback write_cb = nullptr, EventCommunicateCallback communicate_cb = nullptr);
 
    EventLoop(int port, int thread_num = 10, int max_channel = 10000, EventCallback read_cb = nullptr, EventCallback write_cb = nullptr, EventCommunicateCallback communicate_cb = nullptr);
 
    ~EventLoop();
+
+   void Init(std::string profile_path);
+
+   void InitProfilePath(std::string profile_name);
+   
+   void GenerateSubmoduleProfile(YAML::Node config);
 
    void loop();
 
@@ -100,10 +104,17 @@ class EventLoop
   size_t thread_num_;
   size_t max_channel_num_;
   size_t port_;
-  std::string imagine_log_prifile_name_;
-  std::string imagine_log_profile_path_;
-  bool is_singleton_log_mode_;
+  std::string log_name_;
+  std::string log_path_;
+  size_t max_log_file_size_;
+  bool async_log_;
+  bool singleton_log_mode_;
+  std::string log_title_;
+  bool log_with_timestamp_;
   Imagine_Tool::Logger* logger_;
+
+  std::string profile_path_;
+  std::string log_profile_name_;
 
  private:
    bool quit_;

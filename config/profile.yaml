@@ -1,0 +1,10 @@
+port: 9999
+thread_num: 5
+max_channel_num: 10000
+log_name: imagine_log_profile.yaml
+log_path: /home/imagine/MIT6824/Imagine_Muduo/config/
+max_log_file_size: 104857600
+async_log: false
+singleton_log_mode: false
+log_title: Imagine MapReduce
+log_with_timestamp: true
