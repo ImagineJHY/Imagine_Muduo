@@ -53,53 +53,13 @@ void EventLoop::Init(std::string profile_name)
 
     logger_->Init(config);
 
-    destroy_thread_ = new pthread_t;
-    if (!destroy_thread_) {
-        throw std::exception();
-    }
-
-    if (pthread_mutex_init(&destroy_lock_, nullptr) != 0) {
-        throw std::exception();
-    }
-
-    if (pthread_mutex_init(&timer_lock_, nullptr) != 0) {
-        throw std::exception();
-    }
-
-    if (pthread_mutex_init(&timer_map_lock_, nullptr) != 0) {
-        throw std::exception();
-    }
-
+    InitLoop();
 }
 
 EventLoop::EventLoop(int port, int thread_num, int max_channel, EventCallback read_cb, EventCallback write_cb, EventCommunicateCallback communicate_cb)
-                 : quit_(0), channel_num_(0), max_channel_num_(max_channel), read_callback_(read_cb), write_callback_(write_cb), communicate_callback_(communicate_cb), epoll_(new EpollPoller(this)), listen_channel_(Channel::Create(this, port, Channel::ChannelTyep::ListenChannel)), timer_channel_(Channel::Create(this, 0, Channel::ChannelTyep::TimerChannel))
+                 : thread_num_(thread_num), quit_(0), channel_num_(0), max_channel_num_(max_channel), read_callback_(read_cb), write_callback_(write_cb), communicate_callback_(communicate_cb), epoll_(new EpollPoller(this)), listen_channel_(Channel::Create(this, port, Channel::ChannelTyep::ListenChannel)), timer_channel_(Channel::Create(this, 0, Channel::ChannelTyep::TimerChannel))
 {
-    try {
-        pool_ = new ThreadPool<std::shared_ptr<Channel>>(10, max_channel); // 初始化线程池
-    } catch (...) {
-        throw std::exception();
-    }
-
-    destroy_thread_ = new pthread_t;
-    if (!destroy_thread_) {
-        throw std::exception();
-    }
-
-    if (pthread_mutex_init(&destroy_lock_, nullptr) != 0) {
-        throw std::exception();
-    }
-
-    if (pthread_mutex_init(&timer_lock_, nullptr) != 0) {
-        throw std::exception();
-    }
-
-    if (pthread_mutex_init(&timer_map_lock_, nullptr) != 0) {
-        throw std::exception();
-    }
-
-    epoll_->AddChannel(timer_channel_);
-    epoll_->AddChannel(listen_channel_); // 创建监听套接字并添加到epoll
+    InitLoop();
 }
 
 EventLoop::~EventLoop()
@@ -124,6 +84,35 @@ void EventLoop::GenerateSubmoduleProfile(YAML::Node config)
     config.remove(config["singleton_log_mode"]);
     fout << config;
     fout.close();
+}
+
+void EventLoop::InitLoop()
+{
+    try {
+        pool_ = new ThreadPool<std::shared_ptr<Channel>>(thread_num_, max_channel_num_); // 初始化线程池
+    } catch (...) {
+        throw std::exception();
+    }
+
+    destroy_thread_ = new pthread_t;
+    if (!destroy_thread_) {
+        throw std::exception();
+    }
+
+    if (pthread_mutex_init(&destroy_lock_, nullptr) != 0) {
+        throw std::exception();
+    }
+
+    if (pthread_mutex_init(&timer_lock_, nullptr) != 0) {
+        throw std::exception();
+    }
+
+    if (pthread_mutex_init(&timer_map_lock_, nullptr) != 0) {
+        throw std::exception();
+    }
+
+    epoll_->AddChannel(timer_channel_);
+    epoll_->AddChannel(listen_channel_); // 创建监听套接字并添加到epoll
 }
 
 void EventLoop::loop()

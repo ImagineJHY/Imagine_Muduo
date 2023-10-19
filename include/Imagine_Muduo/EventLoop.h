@@ -43,6 +43,8 @@ class EventLoop
    
    void GenerateSubmoduleProfile(YAML::Node config);
 
+   void InitLoop();
+
    void loop();
 
    int GetChannelnum();
