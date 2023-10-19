@@ -13,19 +13,17 @@ namespace Imagine_Muduo
 // long long Imagine_Tool::Timer::id_ = 0;
 
 EventLoop::EventLoop()
-            : quit_(0), epoll_(new EpollPoller(this)), timer_channel_(Channel::Create(this, 0, Channel::ChannelTyep::TimerChannel))
+            : quit_(0), channel_num_(0), epoll_(new EpollPoller(this)), timer_channel_(Channel::Create(this, 0, Channel::ChannelTyep::TimerChannel))
 {
 
 }
 
-EventLoop::EventLoop(std::string profile_name)
-            : quit_(0), epoll_(new EpollPoller(this)), timer_channel_(Channel::Create(this, 0, Channel::ChannelTyep::TimerChannel))
+EventLoop::EventLoop(std::string profile_name) : EventLoop()
 {
     Init(profile_name);
 }
 
-EventLoop::EventLoop(YAML::Node config)
-            : quit_(0), epoll_(new EpollPoller(this)), timer_channel_(Channel::Create(this, 0, Channel::ChannelTyep::TimerChannel))
+EventLoop::EventLoop(YAML::Node config) : EventLoop()
 {
     Init(config);
 }
