@@ -1,10 +1,11 @@
 #include "Imagine_Muduo/EventLoop.h"
 
-#include <memory>
-
 #include "Imagine_Muduo/Channel.h"
 #include "Imagine_Muduo/Poller.h"
 #include "Imagine_Muduo/ThreadPool.h"
+
+#include <memory>
+#include <fstream>
 
 namespace Imagine_Muduo
 {
@@ -116,13 +117,13 @@ void EventLoop::InitProfilePath(std::string profile_name)
 
 void EventLoop::GenerateSubmoduleProfile(YAML::Node config)
 {
-    int fd = open(log_profile_name_.c_str(), O_RDWR | O_CREAT);
+    std::ofstream fout(log_profile_name_.c_str());
     config.remove(config["port"]);
     config.remove(config["thread_num"]);
     config.remove(config["max_channel_num"]);
     config.remove(config["singleton_log_mode"]);
-    write(fd, config.as<std::string>().c_str(), config.as<std::string>().size());
-    close(fd);
+    fout << config;
+    fout.close();
 }
 
 void EventLoop::loop()
