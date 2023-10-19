@@ -24,6 +24,24 @@ EventLoop::EventLoop(std::string profile_name)
     Init(profile_name);
 }
 
+EventLoop::EventLoop(YAML::Node config)
+            : quit_(0), epoll_(new EpollPoller(this)), timer_channel_(Channel::Create(this, 0, Channel::ChannelTyep::TimerChannel))
+{
+    Init(config);
+}
+
+EventLoop::EventLoop(int port, int thread_num, int max_channel, EventCallback read_cb, EventCallback write_cb, EventCommunicateCallback communicate_cb)
+                 : thread_num_(thread_num), quit_(0), channel_num_(0), max_channel_num_(max_channel), read_callback_(read_cb), write_callback_(write_cb), communicate_callback_(communicate_cb), epoll_(new EpollPoller(this)), timer_channel_(Channel::Create(this, 0, Channel::ChannelTyep::TimerChannel))
+{
+    InitLoop();
+}
+
+EventLoop::~EventLoop()
+{
+    delete pool_;
+    delete epoll_;
+}
+
 void EventLoop::Init(std::string profile_name)
 {
     if (profile_name == "") {
@@ -31,6 +49,14 @@ void EventLoop::Init(std::string profile_name)
     }
 
     YAML::Node config = YAML::LoadFile(profile_name);
+    Init(config);
+
+    InitProfilePath(profile_name);
+    GenerateSubmoduleProfile(config);
+}
+
+void EventLoop::Init(YAML::Node config)
+{
     port_ = config["port"].as<size_t>();
     thread_num_ = config["thread_num"].as<size_t>();
     max_channel_num_ = config["max_channel_num"].as<size_t>();
@@ -49,23 +75,9 @@ void EventLoop::Init(std::string profile_name)
         Imagine_Tool::Logger::SetInstance(logger_);
     }
 
-    InitProfilePath(profile_name);
-
     logger_->Init(config);
 
     InitLoop();
-}
-
-EventLoop::EventLoop(int port, int thread_num, int max_channel, EventCallback read_cb, EventCallback write_cb, EventCommunicateCallback communicate_cb)
-                 : thread_num_(thread_num), quit_(0), channel_num_(0), max_channel_num_(max_channel), read_callback_(read_cb), write_callback_(write_cb), communicate_callback_(communicate_cb), epoll_(new EpollPoller(this)), timer_channel_(Channel::Create(this, 0, Channel::ChannelTyep::TimerChannel))
-{
-    InitLoop();
-}
-
-EventLoop::~EventLoop()
-{
-    delete pool_;
-    delete epoll_;
 }
 
 void EventLoop::InitProfilePath(std::string profile_name)

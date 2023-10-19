@@ -33,11 +33,15 @@ class EventLoop
 
    EventLoop(std::string  profile_name);
 
+   EventLoop(YAML::Node config);
+
    EventLoop(int port, int thread_num = 10, int max_channel = 10000, EventCallback read_cb = nullptr, EventCallback write_cb = nullptr, EventCommunicateCallback communicate_cb = nullptr);
 
    ~EventLoop();
 
    void Init(std::string profile_path);
+
+   void Init(YAML::Node config);
 
    void InitProfilePath(std::string profile_name);
    
