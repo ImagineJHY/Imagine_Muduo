@@ -111,32 +111,6 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named build
-
-# Build rule for target.
-build: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 build
-.PHONY : build
-
-# fast build rule for target.
-build/fast:
-	$(MAKE) -f CMakeFiles/build.dir/build.make CMakeFiles/build.dir/build
-.PHONY : build/fast
-
-#=============================================================================
-# Target rules for targets named init
-
-# Build rule for target.
-init: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 init
-.PHONY : init
-
-# fast build rule for target.
-init/fast:
-	$(MAKE) -f CMakeFiles/init.dir/build.make CMakeFiles/init.dir/build
-.PHONY : init/fast
-
-#=============================================================================
 # Target rules for targets named imagine_muduo
 
 # Build rule for target.
@@ -150,82 +124,30 @@ imagine_muduo/fast:
 .PHONY : imagine_muduo/fast
 
 #=============================================================================
-# Target rules for targets named prepare
+# Target rules for targets named imagine_tool
 
 # Build rule for target.
-prepare: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 prepare
-.PHONY : prepare
+imagine_tool: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 imagine_tool
+.PHONY : imagine_tool
 
 # fast build rule for target.
-prepare/fast:
-	$(MAKE) -f CMakeFiles/prepare.dir/build.make CMakeFiles/prepare.dir/build
-.PHONY : prepare/fast
+imagine_tool/fast:
+	$(MAKE) -f thirdparty/Imagine_Tool/CMakeFiles/imagine_tool.dir/build.make thirdparty/Imagine_Tool/CMakeFiles/imagine_tool.dir/build
+.PHONY : imagine_tool/fast
 
 #=============================================================================
-# Target rules for targets named prepare_thirdparty
+# Target rules for targets named imagine_tool_thirdparty
 
 # Build rule for target.
-prepare_thirdparty: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 prepare_thirdparty
-.PHONY : prepare_thirdparty
+imagine_tool_thirdparty: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 imagine_tool_thirdparty
+.PHONY : imagine_tool_thirdparty
 
 # fast build rule for target.
-prepare_thirdparty/fast:
-	$(MAKE) -f thirdparty/Imagine_System/CMakeFiles/prepare_thirdparty.dir/build.make thirdparty/Imagine_System/CMakeFiles/prepare_thirdparty.dir/build
-.PHONY : prepare_thirdparty/fast
-
-#=============================================================================
-# Target rules for targets named prepare_submodule
-
-# Build rule for target.
-prepare_submodule: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 prepare_submodule
-.PHONY : prepare_submodule
-
-# fast build rule for target.
-prepare_submodule/fast:
-	$(MAKE) -f thirdparty/Imagine_System/CMakeFiles/prepare_submodule.dir/build.make thirdparty/Imagine_System/CMakeFiles/prepare_submodule.dir/build
-.PHONY : prepare_submodule/fast
-
-#=============================================================================
-# Target rules for targets named prepare_submodule_bak
-
-# Build rule for target.
-prepare_submodule_bak: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 prepare_submodule_bak
-.PHONY : prepare_submodule_bak
-
-# fast build rule for target.
-prepare_submodule_bak/fast:
-	$(MAKE) -f thirdparty/Imagine_System/CMakeFiles/prepare_submodule_bak.dir/build.make thirdparty/Imagine_System/CMakeFiles/prepare_submodule_bak.dir/build
-.PHONY : prepare_submodule_bak/fast
-
-#=============================================================================
-# Target rules for targets named system_prepare
-
-# Build rule for target.
-system_prepare: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 system_prepare
-.PHONY : system_prepare
-
-# fast build rule for target.
-system_prepare/fast:
-	$(MAKE) -f thirdparty/Imagine_System/CMakeFiles/system_prepare.dir/build.make thirdparty/Imagine_System/CMakeFiles/system_prepare.dir/build
-.PHONY : system_prepare/fast
-
-#=============================================================================
-# Target rules for targets named system_prepare_bak
-
-# Build rule for target.
-system_prepare_bak: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 system_prepare_bak
-.PHONY : system_prepare_bak
-
-# fast build rule for target.
-system_prepare_bak/fast:
-	$(MAKE) -f thirdparty/Imagine_System/CMakeFiles/system_prepare_bak.dir/build.make thirdparty/Imagine_System/CMakeFiles/system_prepare_bak.dir/build
-.PHONY : system_prepare_bak/fast
+imagine_tool_thirdparty/fast:
+	$(MAKE) -f thirdparty/Imagine_Tool/thirdparty/CMakeFiles/imagine_tool_thirdparty.dir/build.make thirdparty/Imagine_Tool/thirdparty/CMakeFiles/imagine_tool_thirdparty.dir/build
+.PHONY : imagine_tool_thirdparty/fast
 
 #=============================================================================
 # Target rules for targets named ContinuousSubmit
@@ -237,7 +159,7 @@ ContinuousSubmit: cmake_check_build_system
 
 # fast build rule for target.
 ContinuousSubmit/fast:
-	$(MAKE) -f thirdparty/Imagine_System/worker/yaml-cpp/CMakeFiles/ContinuousSubmit.dir/build.make thirdparty/Imagine_System/worker/yaml-cpp/CMakeFiles/ContinuousSubmit.dir/build
+	$(MAKE) -f thirdparty/Imagine_Tool/thirdparty/yaml-cpp/CMakeFiles/ContinuousSubmit.dir/build.make thirdparty/Imagine_Tool/thirdparty/yaml-cpp/CMakeFiles/ContinuousSubmit.dir/build
 .PHONY : ContinuousSubmit/fast
 
 #=============================================================================
@@ -250,7 +172,7 @@ ContinuousMemCheck: cmake_check_build_system
 
 # fast build rule for target.
 ContinuousMemCheck/fast:
-	$(MAKE) -f thirdparty/Imagine_System/worker/yaml-cpp/CMakeFiles/ContinuousMemCheck.dir/build.make thirdparty/Imagine_System/worker/yaml-cpp/CMakeFiles/ContinuousMemCheck.dir/build
+	$(MAKE) -f thirdparty/Imagine_Tool/thirdparty/yaml-cpp/CMakeFiles/ContinuousMemCheck.dir/build.make thirdparty/Imagine_Tool/thirdparty/yaml-cpp/CMakeFiles/ContinuousMemCheck.dir/build
 .PHONY : ContinuousMemCheck/fast
 
 #=============================================================================
@@ -263,7 +185,7 @@ ContinuousConfigure: cmake_check_build_system
 
 # fast build rule for target.
 ContinuousConfigure/fast:
-	$(MAKE) -f thirdparty/Imagine_System/worker/yaml-cpp/CMakeFiles/ContinuousConfigure.dir/build.make thirdparty/Imagine_System/worker/yaml-cpp/CMakeFiles/ContinuousConfigure.dir/build
+	$(MAKE) -f thirdparty/Imagine_Tool/thirdparty/yaml-cpp/CMakeFiles/ContinuousConfigure.dir/build.make thirdparty/Imagine_Tool/thirdparty/yaml-cpp/CMakeFiles/ContinuousConfigure.dir/build
 .PHONY : ContinuousConfigure/fast
 
 #=============================================================================
@@ -276,7 +198,7 @@ ExperimentalSubmit: cmake_check_build_system
 
 # fast build rule for target.
 ExperimentalSubmit/fast:
-	$(MAKE) -f thirdparty/Imagine_System/worker/yaml-cpp/CMakeFiles/ExperimentalSubmit.dir/build.make thirdparty/Imagine_System/worker/yaml-cpp/CMakeFiles/ExperimentalSubmit.dir/build
+	$(MAKE) -f thirdparty/Imagine_Tool/thirdparty/yaml-cpp/CMakeFiles/ExperimentalSubmit.dir/build.make thirdparty/Imagine_Tool/thirdparty/yaml-cpp/CMakeFiles/ExperimentalSubmit.dir/build
 .PHONY : ExperimentalSubmit/fast
 
 #=============================================================================
@@ -289,7 +211,7 @@ ExperimentalMemCheck: cmake_check_build_system
 
 # fast build rule for target.
 ExperimentalMemCheck/fast:
-	$(MAKE) -f thirdparty/Imagine_System/worker/yaml-cpp/CMakeFiles/ExperimentalMemCheck.dir/build.make thirdparty/Imagine_System/worker/yaml-cpp/CMakeFiles/ExperimentalMemCheck.dir/build
+	$(MAKE) -f thirdparty/Imagine_Tool/thirdparty/yaml-cpp/CMakeFiles/ExperimentalMemCheck.dir/build.make thirdparty/Imagine_Tool/thirdparty/yaml-cpp/CMakeFiles/ExperimentalMemCheck.dir/build
 .PHONY : ExperimentalMemCheck/fast
 
 #=============================================================================
@@ -302,7 +224,7 @@ ExperimentalTest: cmake_check_build_system
 
 # fast build rule for target.
 ExperimentalTest/fast:
-	$(MAKE) -f thirdparty/Imagine_System/worker/yaml-cpp/CMakeFiles/ExperimentalTest.dir/build.make thirdparty/Imagine_System/worker/yaml-cpp/CMakeFiles/ExperimentalTest.dir/build
+	$(MAKE) -f thirdparty/Imagine_Tool/thirdparty/yaml-cpp/CMakeFiles/ExperimentalTest.dir/build.make thirdparty/Imagine_Tool/thirdparty/yaml-cpp/CMakeFiles/ExperimentalTest.dir/build
 .PHONY : ExperimentalTest/fast
 
 #=============================================================================
@@ -315,7 +237,7 @@ NightlyUpdate: cmake_check_build_system
 
 # fast build rule for target.
 NightlyUpdate/fast:
-	$(MAKE) -f thirdparty/Imagine_System/worker/yaml-cpp/CMakeFiles/NightlyUpdate.dir/build.make thirdparty/Imagine_System/worker/yaml-cpp/CMakeFiles/NightlyUpdate.dir/build
+	$(MAKE) -f thirdparty/Imagine_Tool/thirdparty/yaml-cpp/CMakeFiles/NightlyUpdate.dir/build.make thirdparty/Imagine_Tool/thirdparty/yaml-cpp/CMakeFiles/NightlyUpdate.dir/build
 .PHONY : NightlyUpdate/fast
 
 #=============================================================================
@@ -328,7 +250,7 @@ NightlyStart: cmake_check_build_system
 
 # fast build rule for target.
 NightlyStart/fast:
-	$(MAKE) -f thirdparty/Imagine_System/worker/yaml-cpp/CMakeFiles/NightlyStart.dir/build.make thirdparty/Imagine_System/worker/yaml-cpp/CMakeFiles/NightlyStart.dir/build
+	$(MAKE) -f thirdparty/Imagine_Tool/thirdparty/yaml-cpp/CMakeFiles/NightlyStart.dir/build.make thirdparty/Imagine_Tool/thirdparty/yaml-cpp/CMakeFiles/NightlyStart.dir/build
 .PHONY : NightlyStart/fast
 
 #=============================================================================
@@ -341,7 +263,7 @@ NightlyMemoryCheck: cmake_check_build_system
 
 # fast build rule for target.
 NightlyMemoryCheck/fast:
-	$(MAKE) -f thirdparty/Imagine_System/worker/yaml-cpp/CMakeFiles/NightlyMemoryCheck.dir/build.make thirdparty/Imagine_System/worker/yaml-cpp/CMakeFiles/NightlyMemoryCheck.dir/build
+	$(MAKE) -f thirdparty/Imagine_Tool/thirdparty/yaml-cpp/CMakeFiles/NightlyMemoryCheck.dir/build.make thirdparty/Imagine_Tool/thirdparty/yaml-cpp/CMakeFiles/NightlyMemoryCheck.dir/build
 .PHONY : NightlyMemoryCheck/fast
 
 #=============================================================================
@@ -354,7 +276,7 @@ NightlyBuild: cmake_check_build_system
 
 # fast build rule for target.
 NightlyBuild/fast:
-	$(MAKE) -f thirdparty/Imagine_System/worker/yaml-cpp/CMakeFiles/NightlyBuild.dir/build.make thirdparty/Imagine_System/worker/yaml-cpp/CMakeFiles/NightlyBuild.dir/build
+	$(MAKE) -f thirdparty/Imagine_Tool/thirdparty/yaml-cpp/CMakeFiles/NightlyBuild.dir/build.make thirdparty/Imagine_Tool/thirdparty/yaml-cpp/CMakeFiles/NightlyBuild.dir/build
 .PHONY : NightlyBuild/fast
 
 #=============================================================================
@@ -367,7 +289,7 @@ ExperimentalUpdate: cmake_check_build_system
 
 # fast build rule for target.
 ExperimentalUpdate/fast:
-	$(MAKE) -f thirdparty/Imagine_System/worker/yaml-cpp/CMakeFiles/ExperimentalUpdate.dir/build.make thirdparty/Imagine_System/worker/yaml-cpp/CMakeFiles/ExperimentalUpdate.dir/build
+	$(MAKE) -f thirdparty/Imagine_Tool/thirdparty/yaml-cpp/CMakeFiles/ExperimentalUpdate.dir/build.make thirdparty/Imagine_Tool/thirdparty/yaml-cpp/CMakeFiles/ExperimentalUpdate.dir/build
 .PHONY : ExperimentalUpdate/fast
 
 #=============================================================================
@@ -380,7 +302,7 @@ ContinuousBuild: cmake_check_build_system
 
 # fast build rule for target.
 ContinuousBuild/fast:
-	$(MAKE) -f thirdparty/Imagine_System/worker/yaml-cpp/CMakeFiles/ContinuousBuild.dir/build.make thirdparty/Imagine_System/worker/yaml-cpp/CMakeFiles/ContinuousBuild.dir/build
+	$(MAKE) -f thirdparty/Imagine_Tool/thirdparty/yaml-cpp/CMakeFiles/ContinuousBuild.dir/build.make thirdparty/Imagine_Tool/thirdparty/yaml-cpp/CMakeFiles/ContinuousBuild.dir/build
 .PHONY : ContinuousBuild/fast
 
 #=============================================================================
@@ -393,7 +315,7 @@ Continuous: cmake_check_build_system
 
 # fast build rule for target.
 Continuous/fast:
-	$(MAKE) -f thirdparty/Imagine_System/worker/yaml-cpp/CMakeFiles/Continuous.dir/build.make thirdparty/Imagine_System/worker/yaml-cpp/CMakeFiles/Continuous.dir/build
+	$(MAKE) -f thirdparty/Imagine_Tool/thirdparty/yaml-cpp/CMakeFiles/Continuous.dir/build.make thirdparty/Imagine_Tool/thirdparty/yaml-cpp/CMakeFiles/Continuous.dir/build
 .PHONY : Continuous/fast
 
 #=============================================================================
@@ -406,7 +328,7 @@ Experimental: cmake_check_build_system
 
 # fast build rule for target.
 Experimental/fast:
-	$(MAKE) -f thirdparty/Imagine_System/worker/yaml-cpp/CMakeFiles/Experimental.dir/build.make thirdparty/Imagine_System/worker/yaml-cpp/CMakeFiles/Experimental.dir/build
+	$(MAKE) -f thirdparty/Imagine_Tool/thirdparty/yaml-cpp/CMakeFiles/Experimental.dir/build.make thirdparty/Imagine_Tool/thirdparty/yaml-cpp/CMakeFiles/Experimental.dir/build
 .PHONY : Experimental/fast
 
 #=============================================================================
@@ -419,7 +341,7 @@ ExperimentalConfigure: cmake_check_build_system
 
 # fast build rule for target.
 ExperimentalConfigure/fast:
-	$(MAKE) -f thirdparty/Imagine_System/worker/yaml-cpp/CMakeFiles/ExperimentalConfigure.dir/build.make thirdparty/Imagine_System/worker/yaml-cpp/CMakeFiles/ExperimentalConfigure.dir/build
+	$(MAKE) -f thirdparty/Imagine_Tool/thirdparty/yaml-cpp/CMakeFiles/ExperimentalConfigure.dir/build.make thirdparty/Imagine_Tool/thirdparty/yaml-cpp/CMakeFiles/ExperimentalConfigure.dir/build
 .PHONY : ExperimentalConfigure/fast
 
 #=============================================================================
@@ -432,7 +354,7 @@ NightlyTest: cmake_check_build_system
 
 # fast build rule for target.
 NightlyTest/fast:
-	$(MAKE) -f thirdparty/Imagine_System/worker/yaml-cpp/CMakeFiles/NightlyTest.dir/build.make thirdparty/Imagine_System/worker/yaml-cpp/CMakeFiles/NightlyTest.dir/build
+	$(MAKE) -f thirdparty/Imagine_Tool/thirdparty/yaml-cpp/CMakeFiles/NightlyTest.dir/build.make thirdparty/Imagine_Tool/thirdparty/yaml-cpp/CMakeFiles/NightlyTest.dir/build
 .PHONY : NightlyTest/fast
 
 #=============================================================================
@@ -445,7 +367,7 @@ NightlyCoverage: cmake_check_build_system
 
 # fast build rule for target.
 NightlyCoverage/fast:
-	$(MAKE) -f thirdparty/Imagine_System/worker/yaml-cpp/CMakeFiles/NightlyCoverage.dir/build.make thirdparty/Imagine_System/worker/yaml-cpp/CMakeFiles/NightlyCoverage.dir/build
+	$(MAKE) -f thirdparty/Imagine_Tool/thirdparty/yaml-cpp/CMakeFiles/NightlyCoverage.dir/build.make thirdparty/Imagine_Tool/thirdparty/yaml-cpp/CMakeFiles/NightlyCoverage.dir/build
 .PHONY : NightlyCoverage/fast
 
 #=============================================================================
@@ -458,7 +380,7 @@ yaml-cpp: cmake_check_build_system
 
 # fast build rule for target.
 yaml-cpp/fast:
-	$(MAKE) -f thirdparty/Imagine_System/worker/yaml-cpp/CMakeFiles/yaml-cpp.dir/build.make thirdparty/Imagine_System/worker/yaml-cpp/CMakeFiles/yaml-cpp.dir/build
+	$(MAKE) -f thirdparty/Imagine_Tool/thirdparty/yaml-cpp/CMakeFiles/yaml-cpp.dir/build.make thirdparty/Imagine_Tool/thirdparty/yaml-cpp/CMakeFiles/yaml-cpp.dir/build
 .PHONY : yaml-cpp/fast
 
 #=============================================================================
@@ -471,7 +393,7 @@ ExperimentalCoverage: cmake_check_build_system
 
 # fast build rule for target.
 ExperimentalCoverage/fast:
-	$(MAKE) -f thirdparty/Imagine_System/worker/yaml-cpp/CMakeFiles/ExperimentalCoverage.dir/build.make thirdparty/Imagine_System/worker/yaml-cpp/CMakeFiles/ExperimentalCoverage.dir/build
+	$(MAKE) -f thirdparty/Imagine_Tool/thirdparty/yaml-cpp/CMakeFiles/ExperimentalCoverage.dir/build.make thirdparty/Imagine_Tool/thirdparty/yaml-cpp/CMakeFiles/ExperimentalCoverage.dir/build
 .PHONY : ExperimentalCoverage/fast
 
 #=============================================================================
@@ -484,7 +406,7 @@ NightlyMemCheck: cmake_check_build_system
 
 # fast build rule for target.
 NightlyMemCheck/fast:
-	$(MAKE) -f thirdparty/Imagine_System/worker/yaml-cpp/CMakeFiles/NightlyMemCheck.dir/build.make thirdparty/Imagine_System/worker/yaml-cpp/CMakeFiles/NightlyMemCheck.dir/build
+	$(MAKE) -f thirdparty/Imagine_Tool/thirdparty/yaml-cpp/CMakeFiles/NightlyMemCheck.dir/build.make thirdparty/Imagine_Tool/thirdparty/yaml-cpp/CMakeFiles/NightlyMemCheck.dir/build
 .PHONY : NightlyMemCheck/fast
 
 #=============================================================================
@@ -497,7 +419,7 @@ ContinuousStart: cmake_check_build_system
 
 # fast build rule for target.
 ContinuousStart/fast:
-	$(MAKE) -f thirdparty/Imagine_System/worker/yaml-cpp/CMakeFiles/ContinuousStart.dir/build.make thirdparty/Imagine_System/worker/yaml-cpp/CMakeFiles/ContinuousStart.dir/build
+	$(MAKE) -f thirdparty/Imagine_Tool/thirdparty/yaml-cpp/CMakeFiles/ContinuousStart.dir/build.make thirdparty/Imagine_Tool/thirdparty/yaml-cpp/CMakeFiles/ContinuousStart.dir/build
 .PHONY : ContinuousStart/fast
 
 #=============================================================================
@@ -510,7 +432,7 @@ NightlySubmit: cmake_check_build_system
 
 # fast build rule for target.
 NightlySubmit/fast:
-	$(MAKE) -f thirdparty/Imagine_System/worker/yaml-cpp/CMakeFiles/NightlySubmit.dir/build.make thirdparty/Imagine_System/worker/yaml-cpp/CMakeFiles/NightlySubmit.dir/build
+	$(MAKE) -f thirdparty/Imagine_Tool/thirdparty/yaml-cpp/CMakeFiles/NightlySubmit.dir/build.make thirdparty/Imagine_Tool/thirdparty/yaml-cpp/CMakeFiles/NightlySubmit.dir/build
 .PHONY : NightlySubmit/fast
 
 #=============================================================================
@@ -523,7 +445,7 @@ ContinuousCoverage: cmake_check_build_system
 
 # fast build rule for target.
 ContinuousCoverage/fast:
-	$(MAKE) -f thirdparty/Imagine_System/worker/yaml-cpp/CMakeFiles/ContinuousCoverage.dir/build.make thirdparty/Imagine_System/worker/yaml-cpp/CMakeFiles/ContinuousCoverage.dir/build
+	$(MAKE) -f thirdparty/Imagine_Tool/thirdparty/yaml-cpp/CMakeFiles/ContinuousCoverage.dir/build.make thirdparty/Imagine_Tool/thirdparty/yaml-cpp/CMakeFiles/ContinuousCoverage.dir/build
 .PHONY : ContinuousCoverage/fast
 
 #=============================================================================
@@ -536,7 +458,7 @@ Nightly: cmake_check_build_system
 
 # fast build rule for target.
 Nightly/fast:
-	$(MAKE) -f thirdparty/Imagine_System/worker/yaml-cpp/CMakeFiles/Nightly.dir/build.make thirdparty/Imagine_System/worker/yaml-cpp/CMakeFiles/Nightly.dir/build
+	$(MAKE) -f thirdparty/Imagine_Tool/thirdparty/yaml-cpp/CMakeFiles/Nightly.dir/build.make thirdparty/Imagine_Tool/thirdparty/yaml-cpp/CMakeFiles/Nightly.dir/build
 .PHONY : Nightly/fast
 
 #=============================================================================
@@ -549,7 +471,7 @@ NightlyConfigure: cmake_check_build_system
 
 # fast build rule for target.
 NightlyConfigure/fast:
-	$(MAKE) -f thirdparty/Imagine_System/worker/yaml-cpp/CMakeFiles/NightlyConfigure.dir/build.make thirdparty/Imagine_System/worker/yaml-cpp/CMakeFiles/NightlyConfigure.dir/build
+	$(MAKE) -f thirdparty/Imagine_Tool/thirdparty/yaml-cpp/CMakeFiles/NightlyConfigure.dir/build.make thirdparty/Imagine_Tool/thirdparty/yaml-cpp/CMakeFiles/NightlyConfigure.dir/build
 .PHONY : NightlyConfigure/fast
 
 #=============================================================================
@@ -562,7 +484,7 @@ ExperimentalStart: cmake_check_build_system
 
 # fast build rule for target.
 ExperimentalStart/fast:
-	$(MAKE) -f thirdparty/Imagine_System/worker/yaml-cpp/CMakeFiles/ExperimentalStart.dir/build.make thirdparty/Imagine_System/worker/yaml-cpp/CMakeFiles/ExperimentalStart.dir/build
+	$(MAKE) -f thirdparty/Imagine_Tool/thirdparty/yaml-cpp/CMakeFiles/ExperimentalStart.dir/build.make thirdparty/Imagine_Tool/thirdparty/yaml-cpp/CMakeFiles/ExperimentalStart.dir/build
 .PHONY : ExperimentalStart/fast
 
 #=============================================================================
@@ -575,7 +497,7 @@ ContinuousTest: cmake_check_build_system
 
 # fast build rule for target.
 ContinuousTest/fast:
-	$(MAKE) -f thirdparty/Imagine_System/worker/yaml-cpp/CMakeFiles/ContinuousTest.dir/build.make thirdparty/Imagine_System/worker/yaml-cpp/CMakeFiles/ContinuousTest.dir/build
+	$(MAKE) -f thirdparty/Imagine_Tool/thirdparty/yaml-cpp/CMakeFiles/ContinuousTest.dir/build.make thirdparty/Imagine_Tool/thirdparty/yaml-cpp/CMakeFiles/ContinuousTest.dir/build
 .PHONY : ContinuousTest/fast
 
 #=============================================================================
@@ -588,7 +510,7 @@ ContinuousUpdate: cmake_check_build_system
 
 # fast build rule for target.
 ContinuousUpdate/fast:
-	$(MAKE) -f thirdparty/Imagine_System/worker/yaml-cpp/CMakeFiles/ContinuousUpdate.dir/build.make thirdparty/Imagine_System/worker/yaml-cpp/CMakeFiles/ContinuousUpdate.dir/build
+	$(MAKE) -f thirdparty/Imagine_Tool/thirdparty/yaml-cpp/CMakeFiles/ContinuousUpdate.dir/build.make thirdparty/Imagine_Tool/thirdparty/yaml-cpp/CMakeFiles/ContinuousUpdate.dir/build
 .PHONY : ContinuousUpdate/fast
 
 #=============================================================================
@@ -601,7 +523,7 @@ ExperimentalBuild: cmake_check_build_system
 
 # fast build rule for target.
 ExperimentalBuild/fast:
-	$(MAKE) -f thirdparty/Imagine_System/worker/yaml-cpp/CMakeFiles/ExperimentalBuild.dir/build.make thirdparty/Imagine_System/worker/yaml-cpp/CMakeFiles/ExperimentalBuild.dir/build
+	$(MAKE) -f thirdparty/Imagine_Tool/thirdparty/yaml-cpp/CMakeFiles/ExperimentalBuild.dir/build.make thirdparty/Imagine_Tool/thirdparty/yaml-cpp/CMakeFiles/ExperimentalBuild.dir/build
 .PHONY : ExperimentalBuild/fast
 
 #=============================================================================
@@ -614,7 +536,7 @@ yaml-cpp-read: cmake_check_build_system
 
 # fast build rule for target.
 yaml-cpp-read/fast:
-	$(MAKE) -f thirdparty/Imagine_System/worker/yaml-cpp/util/CMakeFiles/yaml-cpp-read.dir/build.make thirdparty/Imagine_System/worker/yaml-cpp/util/CMakeFiles/yaml-cpp-read.dir/build
+	$(MAKE) -f thirdparty/Imagine_Tool/thirdparty/yaml-cpp/util/CMakeFiles/yaml-cpp-read.dir/build.make thirdparty/Imagine_Tool/thirdparty/yaml-cpp/util/CMakeFiles/yaml-cpp-read.dir/build
 .PHONY : yaml-cpp-read/fast
 
 #=============================================================================
@@ -627,7 +549,7 @@ yaml-cpp-sandbox: cmake_check_build_system
 
 # fast build rule for target.
 yaml-cpp-sandbox/fast:
-	$(MAKE) -f thirdparty/Imagine_System/worker/yaml-cpp/util/CMakeFiles/yaml-cpp-sandbox.dir/build.make thirdparty/Imagine_System/worker/yaml-cpp/util/CMakeFiles/yaml-cpp-sandbox.dir/build
+	$(MAKE) -f thirdparty/Imagine_Tool/thirdparty/yaml-cpp/util/CMakeFiles/yaml-cpp-sandbox.dir/build.make thirdparty/Imagine_Tool/thirdparty/yaml-cpp/util/CMakeFiles/yaml-cpp-sandbox.dir/build
 .PHONY : yaml-cpp-sandbox/fast
 
 #=============================================================================
@@ -640,21 +562,8 @@ yaml-cpp-parse: cmake_check_build_system
 
 # fast build rule for target.
 yaml-cpp-parse/fast:
-	$(MAKE) -f thirdparty/Imagine_System/worker/yaml-cpp/util/CMakeFiles/yaml-cpp-parse.dir/build.make thirdparty/Imagine_System/worker/yaml-cpp/util/CMakeFiles/yaml-cpp-parse.dir/build
+	$(MAKE) -f thirdparty/Imagine_Tool/thirdparty/yaml-cpp/util/CMakeFiles/yaml-cpp-parse.dir/build.make thirdparty/Imagine_Tool/thirdparty/yaml-cpp/util/CMakeFiles/yaml-cpp-parse.dir/build
 .PHONY : yaml-cpp-parse/fast
-
-#=============================================================================
-# Target rules for targets named imagine_tool
-
-# Build rule for target.
-imagine_tool: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 imagine_tool
-.PHONY : imagine_tool
-
-# fast build rule for target.
-imagine_tool/fast:
-	$(MAKE) -f thirdparty/Imagine_System/worker/Imagine_Tool/CMakeFiles/imagine_tool.dir/build.make thirdparty/Imagine_System/worker/Imagine_Tool/CMakeFiles/imagine_tool.dir/build
-.PHONY : imagine_tool/fast
 
 #=============================================================================
 # Target rules for targets named imagine_time
@@ -666,7 +575,7 @@ imagine_time: cmake_check_build_system
 
 # fast build rule for target.
 imagine_time/fast:
-	$(MAKE) -f thirdparty/Imagine_System/worker/Imagine_Tool/Imagine_Time/CMakeFiles/imagine_time.dir/build.make thirdparty/Imagine_System/worker/Imagine_Tool/Imagine_Time/CMakeFiles/imagine_time.dir/build
+	$(MAKE) -f thirdparty/Imagine_Tool/Imagine_Time/CMakeFiles/imagine_time.dir/build.make thirdparty/Imagine_Tool/Imagine_Time/CMakeFiles/imagine_time.dir/build
 .PHONY : imagine_time/fast
 
 #=============================================================================
@@ -679,7 +588,7 @@ imagine_log: cmake_check_build_system
 
 # fast build rule for target.
 imagine_log/fast:
-	$(MAKE) -f thirdparty/Imagine_System/worker/Imagine_Tool/Imagine_Log/CMakeFiles/imagine_log.dir/build.make thirdparty/Imagine_System/worker/Imagine_Tool/Imagine_Log/CMakeFiles/imagine_log.dir/build
+	$(MAKE) -f thirdparty/Imagine_Tool/Imagine_Log/CMakeFiles/imagine_log.dir/build.make thirdparty/Imagine_Tool/Imagine_Log/CMakeFiles/imagine_log.dir/build
 .PHONY : imagine_log/fast
 
 src/Channel.o: src/Channel.cpp.o
@@ -770,16 +679,10 @@ help:
 	@echo "... clean"
 	@echo "... depend"
 	@echo "... rebuild_cache"
-	@echo "... edit_cache"
-	@echo "... build"
-	@echo "... init"
 	@echo "... imagine_muduo"
-	@echo "... prepare"
-	@echo "... prepare_thirdparty"
-	@echo "... prepare_submodule"
-	@echo "... prepare_submodule_bak"
-	@echo "... system_prepare"
-	@echo "... system_prepare_bak"
+	@echo "... edit_cache"
+	@echo "... imagine_tool"
+	@echo "... imagine_tool_thirdparty"
 	@echo "... ContinuousSubmit"
 	@echo "... ContinuousMemCheck"
 	@echo "... ContinuousConfigure"
@@ -812,7 +715,6 @@ help:
 	@echo "... yaml-cpp-read"
 	@echo "... yaml-cpp-sandbox"
 	@echo "... yaml-cpp-parse"
-	@echo "... imagine_tool"
 	@echo "... imagine_time"
 	@echo "... imagine_log"
 	@echo "... src/Channel.o"
