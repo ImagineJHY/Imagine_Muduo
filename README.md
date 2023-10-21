@@ -1,10 +1,13 @@
 # Imagine_Muduo
+
 Imagine_Muduo is a network communication implementer providing thread pool with producer-consumer module and realizing IO multiplexing with epoll in C++.
 
 ## Any Problems
+
 If you find a bug, post an [issue](https://github.com/ImagineJHY/Imagine_Muduo/issues)! If you have questions about how to use Imagine_Muduo, feel free to shoot me an email at imaginejhy@163.com
 
 ## How to Build
+
 Imagine_Muduo uses [CMake](http://www.cmake.org) to support building. Install CMake before proceeding.
 
 #### 1. Navigating into the source directory
