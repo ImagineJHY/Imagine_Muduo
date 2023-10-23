@@ -1,14 +1,13 @@
-#include "Channel.h"
+#include "Imagine_Muduo/Channel.h"
+#include "Imagine_Muduo/EventLoop.h"
+#include "Imagine_Muduo/Buffer.h"
+#include "Imagine_Muduo/Poller.h"
 
 #include <memory>
 #include <sys/uio.h>
 
-#include "EventLoop.h"
-#include "Buffer.h"
-#include "TimeUtil.h"
-#include "Poller.h"
-
-using namespace Imagine_Muduo;
+namespace Imagine_Muduo
+{
 
 void Channel::MakeSelf(std::shared_ptr<Channel> self)
 {
@@ -179,7 +178,7 @@ void Channel::SetNonBlocking(int fd)
     fcntl(fd, F_SETFL, new_option);
 }
 
-std::shared_ptr<Channel> Channel::Create(EventLoop *loop, int value, int type)
+std::shared_ptr<Channel> Channel::Create(EventLoop *loop, int value, ChannelTyep type)
 {
 
     if (value < 0) {
@@ -194,7 +193,7 @@ std::shared_ptr<Channel> Channel::Create(EventLoop *loop, int value, int type)
     std::shared_ptr<Channel> new_channel = std::make_shared<Channel>();
     new_channel->SetEventHandler(std::bind(&Channel::DefaultEventHandler, new_channel.get()));
 
-    if (type == 1) { // 创建通信Channel
+    if (type == EventChannel) { // 创建通信Channel
         new_channel->SetReadEventHandler(std::bind(&Channel::DefaultEventfdReadEventHandler, new_channel.get()));
         new_channel->SetWriteEventHandler(std::bind(&Channel::DefaultEventfdWriteEventHandler, new_channel.get()));
         listenfd = value;
@@ -211,10 +210,10 @@ std::shared_ptr<Channel> Channel::Create(EventLoop *loop, int value, int type)
         }
         setsockopt(sockfd, SOL_SOCKET, SO_REUSEPORT, &reuse, sizeof(reuse)); // 设置端口复用
         events = EPOLLIN | EPOLLRDHUP | EPOLLONESHOT;
-    } else if (type == 2) { // 创建timerChannel
+    } else if (type == TimerChannel) { // 创建timerChannel
 
         new_channel->SetReadEventHandler(std::bind(&Channel::DefaultTimerfdReadEventHandler, new_channel.get()));
-        sockfd = TimeUtil::CreateTimer();
+        sockfd = Imagine_Tool::TimeUtil::CreateTimer();
         setsockopt(sockfd, SOL_SOCKET, SO_REUSEPORT, &reuse, sizeof(reuse)); // 设置端口复用
         events = EPOLLIN | EPOLLRDHUP | EPOLLONESHOT | EPOLLET;
         listenfd = 0;
@@ -233,18 +232,14 @@ std::shared_ptr<Channel> Channel::Create(EventLoop *loop, int value, int type)
         bind(sockfd, (struct sockaddr *)&saddr, sizeof(saddr)); // 绑定端口
 
         if (listen(sockfd, 5) == -1) {
-            printf("Create listen exception!\n");
+            LOG_INFO("Create listen exception!");
             throw std::exception();
         }
         events = EPOLLIN | EPOLLRDHUP | EPOLLONESHOT;
     }
 
     SetNonBlocking(sockfd);
-    // Channel* new_channel=new Channel;
-    // std::shared_ptr<Channel> new_channel=std::make_shared<Channel>();
-    // printf("befor MakeSelf, usecount is %d\n",new_channel.use_count());
     new_channel->MakeSelf(new_channel);
-    // printf("after MakeSelf, usecount is %d\n",new_channel.use_count());
     new_channel->SetLoop(loop);
     new_channel->Setfd(sockfd);
     new_channel->SetAddr(saddr);
@@ -312,7 +307,7 @@ bool Channel::Send(struct iovec *data, int len)
 
 Channel::~Channel() noexcept
 {
-    printf("remove channel!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!%p\n", this);
+    LOG_INFO("remove channel!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!%p", this);
 }
 
 void Channel::HandleEvent()
@@ -383,7 +378,7 @@ void Channel::DefaultEventfdReadEventHandler()
     if (!read_buffer_.Read(fd_)) {
         // 读取全部内容到reaad_buffer
         // printf("对方已关闭连接!\n");
-        printf("close channel:%p\n",this);
+        LOG_INFO("close channel:%p",this);
         Close();
         return;
     }
@@ -392,7 +387,7 @@ void Channel::DefaultEventfdReadEventHandler()
         if (!communicate_callback_(read_buffer_.GetData(), read_buffer_.GetLen())) {
             // 粘包
             // printf("Tcp粘包!\n");
-            printf("communicate channel:%p\n",this);
+            LOG_INFO("communicate channel:%p",this);
             SetEvents(EPOLLIN | EPOLLONESHOT | EPOLLRDHUP);
 
             return;
@@ -445,10 +440,10 @@ void Channel::DefaultEventfdReadEventHandler()
 
 void Channel::DefaultTimerfdReadEventHandler()
 {
-    TimeStamp now(TimeUtil::GetNow());
-    TimeUtil::ReadTimerfd(this->Getfd());
+    Imagine_Tool::TimeStamp now(Imagine_Tool::TimeUtil::GetNow());
+    Imagine_Tool::TimeUtil::ReadTimerfd(this->Getfd());
     // printf("after reading timer!\n");
-    std::vector<Timer *> expired_timers = this->GetLoop()->GetExpiredTimers(now);
+    std::vector<Imagine_Tool::Timer *> expired_timers = this->GetLoop()->GetExpiredTimers(now);
     // printf("expired num is %d\n",expired_timers.size());
     SetEvents(EPOLLIN | EPOLLONESHOT | EPOLLRDHUP | EPOLLET);
     for (size_t i = 0; i < expired_timers.size(); i++) {
@@ -469,7 +464,7 @@ void Channel::DefaultTimerfdReadEventHandler()
 
 void Channel::DefaultEventfdWriteEventHandler()
 {
-    printf("write channel:%p\n",this);
+    LOG_INFO("write channel:%p",this);
     if (write_callback_) {
         // iov_base第一个字节用于标识该段char*由谁删除,1表示需要在这里删除
         struct iovec *write_iovec;
@@ -496,7 +491,7 @@ void Channel::DefaultEventfdWriteEventHandler()
         }
         if (!Send(write_iovec + 1, write_iovec[0].iov_len - 1)) {
             // 错误关闭
-            printf("write error channel:%p\n",this);
+            LOG_INFO("write error channel:%p",this);
             delete[] write_iovec;
             if (write_iovec_) {
                 ProcessIovec(write_iovec_);
@@ -730,3 +725,5 @@ bool Channel::SetWriteEventHandler(EventHandler write_handler)
 
 //     return true;
 // }
+
+} // namespace Imagine_Muduo
