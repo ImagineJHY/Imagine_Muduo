@@ -14,9 +14,9 @@ class Server
  public:
     Server();
 
-    Server(std::string profile_name, Connection* acceptor = new Acceptor(), Connection* msg_conn = new TcpConnection());
+    Server(std::string profile_name, Connection* msg_conn = new TcpConnection(), Connection* acceptor = new Acceptor());
 
-    Server(YAML::Node config, Connection* acceptor = new Acceptor(), Connection* msg_conn = new TcpConnection());
+    Server(YAML::Node config, Connection* msg_conn = new TcpConnection(), Connection* acceptor = new Acceptor());
 
     virtual ~Server();
 

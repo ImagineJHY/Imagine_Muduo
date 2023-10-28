@@ -7,12 +7,12 @@ Server::Server()
 {
 }
 
-Server::Server(std::string profile_name, Connection* acceptor, Connection* msg_conn) : loop_(new EventLoop(profile_name)), acceptor_(acceptor), msg_conn_(msg_conn)
+Server::Server(std::string profile_name, Connection* msg_conn, Connection* acceptor) : loop_(new EventLoop(profile_name)), acceptor_(acceptor), msg_conn_(msg_conn)
 {
     Init();
 }
 
-Server::Server(YAML::Node config, Connection* acceptor, Connection* msg_conn) : loop_(new EventLoop(config)), acceptor_(acceptor), msg_conn_(msg_conn)
+Server::Server(YAML::Node config, Connection* msg_conn, Connection* acceptor) : loop_(new EventLoop(config)), acceptor_(acceptor), msg_conn_(msg_conn)
 {
     Init();
 }

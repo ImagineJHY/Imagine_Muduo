@@ -19,6 +19,14 @@ TcpServer::TcpServer(YAML::Node config) : Server(config)
 {
 }
 
+TcpServer::TcpServer(std::string profile_name, Connection* msg_conn) : Server(profile_name, msg_conn)
+{
+}
+
+TcpServer::TcpServer(YAML::Node config, Connection* msg_conn) : Server(config, msg_conn)
+{
+}
+
 void TcpServer::DefaultReadCallback(Connection* conn)
 {
     return;

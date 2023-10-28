@@ -15,6 +15,10 @@ class TcpServer : public Server
 
     TcpServer(YAML::Node config);
 
+    TcpServer(std::string profile_name, Connection* msg_conn);
+
+    TcpServer(YAML::Node config, Connection* msg_conn);
+
     ~TcpServer();
 
     void DefaultReadCallback(Connection* conn);
