@@ -17,7 +17,7 @@ namespace Imagine_Muduo
 class Buffer
 {
  public:
-    Buffer(int buffer_size = 1000)
+    Buffer(size_t buffer_size = 1000)
     {
         buf_.reserve(buffer_size);
         read_idx_ = 0;
@@ -68,10 +68,10 @@ class Buffer
         return 0;
     }
 
-    void append(const char *data, int len)
+    void append(const char *data, size_t len)
     {
         EnsureWritableBytes(len);
-        for (int i = 0; i < len; i++) {
+        for (size_t i = 0; i < len; i++) {
             buf_[write_idx_ + i] = data[i];
         }
         write_idx_ += len;
@@ -84,7 +84,7 @@ class Buffer
         }
         std::string temp_string;
         temp_string.reserve(len);
-        for (int i = 0; i < len; i++) {
+        for (size_t i = 0; i < len; i++) {
             temp_string[i] = buf_[read_idx_ + i];
         }
         read_idx_ += len;
@@ -96,7 +96,7 @@ class Buffer
     {
         std::string temp_string;
         temp_string.reserve(write_idx_ - read_idx_);
-        for (int i = read_idx_, j = 0; i < write_idx_; i++, j++) {
+        for (size_t i = read_idx_, j = 0; i < write_idx_; i++, j++) {
             temp_string.push_back(buf_[i]);
         }
         read_idx_ = write_idx_ = 0;
@@ -104,14 +104,14 @@ class Buffer
         return temp_string;
     }
 
-    void EnsureWritableBytes(int len)
+    void EnsureWritableBytes(size_t len)
     {
         if (total_size_ - write_idx_ < len) {
             if (total_size_ - write_idx_ + read_idx_ < len) {
                 buf_.reserve(total_size_ + len);
                 total_size_ += len;
             } else {
-                for (int i = read_idx_, j = 0; i < write_idx_; i++, j++) {
+                for (size_t i = read_idx_, j = 0; i < write_idx_; i++, j++) {
                     buf_[j] = buf_[i];
                 }
                 write_idx_ -= read_idx_;
@@ -147,12 +147,12 @@ class Buffer
         return write_idx_ - read_idx_;
     }
 
-    char *GetData()
+    const char *GetData() const
     {
         return &buf_[read_idx_];
     }
 
-    size_t GetLen()
+    size_t GetLen() const
     {
         return write_idx_ - read_idx_;
     }
@@ -191,7 +191,7 @@ class Buffer
     std::vector<char> buf_;
     size_t read_idx_;
     size_t write_idx_;
-    int total_size_;
+    size_t total_size_;
 };
 
 } // namespace Imagine_Muduo

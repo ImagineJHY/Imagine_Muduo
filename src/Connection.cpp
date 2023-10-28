@@ -164,14 +164,85 @@ std::string Connection::GetPort() const
     return port_;
 }
 
+Server* Connection::GetServer() const
+{
+    return server_;
+}
+
 Connection* const Connection::SetServer(Server* const server)
 {
     server_ = server;
 }
 
-Server* Connection::GetServer() const
+size_t Connection::GetMessageLen() const
 {
-    return server_;
+    return msg_end_idx_ - msg_begin_idx_;
+}
+
+const char* Connection::GetData() const
+{
+    return read_buffer_.GetData();
+}
+
+size_t Connection::GetLen() const
+{
+    return read_buffer_.GetLen();
+}
+
+Connection* const Connection::AppendData(const char* data, size_t len)
+{
+    write_buffer_.append(data, len);
+
+    return this;
+}
+
+Connection* const Connection::ClearReadBuffer()
+{
+    read_buffer_.Clear();
+
+    return this;
+}
+
+Connection* const Connection::ClearWriteBuffer()
+{
+    write_buffer_.Clear();
+
+    return this;
+}
+
+Connection* const Connection::SetAlive(bool keep_alive)
+{
+    keep_alive_ = keep_alive;
+    
+    return this;
+}
+
+Connection* const Connection::SetRevent(Connection::Event revent)
+{
+    next_event_ = revent;
+
+    return this;
+}
+
+Connection* const Connection::IsTakeNextMessage(bool get_next_msg)
+{
+    get_next_msg_ = get_next_msg;
+
+    return this;
+}
+
+Connection* const Connection::IsClearReadBuffer(bool is_clear)
+{
+    clear_read_buffer_ = is_clear;
+
+    return this;
+}
+
+Connection* const Connection::IsClearWriteBuffer(bool is_clear)
+{
+    clear_write_buffer_ = is_clear;
+
+    return this;
 }
 
 Connection* const Connection::SetReadCallback(ConnectionCallback read_callback)

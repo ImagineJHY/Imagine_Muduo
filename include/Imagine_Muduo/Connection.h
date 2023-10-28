@@ -80,9 +80,31 @@ class Connection
 
    std::string GetPort() const;
 
+   Server* GetServer() const;
+
    Connection* const SetServer(Server* const server);
 
-   Server* GetServer() const;
+   size_t GetMessageLen() const;
+
+   const char* GetData() const;
+
+   size_t GetLen() const;
+
+   Connection* const AppendData(const char* data, size_t len);
+
+   Connection* const ClearReadBuffer();
+
+   Connection* const ClearWriteBuffer();
+
+   Connection* const SetAlive(bool keep_alive);
+
+   Connection* const SetRevent(Event revent);
+
+   Connection* const IsTakeNextMessage(bool get_next_msg);
+
+   Connection* const IsClearReadBuffer(bool is_clear);
+
+   Connection* const IsClearWriteBuffer(bool is_clear);
 
    Connection* const SetReadCallback(ConnectionCallback read_callback);
 
