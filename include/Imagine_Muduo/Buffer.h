@@ -1,13 +1,15 @@
 #ifndef IMAGINE_MUDUO_BUFFER_H
 #define IMAGINE_MUDUO_BUFFER_H
 
+#include "Imagine_Log/Logger.h"
+#include "Imagine_Log/SingletonLogger.h"
+#include "Imagine_Muduo/common_definition.h"
+
 #include <sys/types.h>
 #include <string>
 #include <vector>
 #include <sys/socket.h>
 #include <functional>
-
-#include "Imagine_Muduo/common_definition.h"
 
 namespace Imagine_Muduo
 {
@@ -25,7 +27,7 @@ class Buffer
 
     ~Buffer()
     {
-        LOG_INFO("!!!!!!!!!!!!!!!!!!!!!remove buffer:%p", this);
+        // LOG_INFO("!!!!!!!!!!!!!!!!!!!!!remove buffer:%p", this);
     }
 
     bool Read(int fd, EventCommunicateCallback callback = nullptr)
@@ -37,7 +39,7 @@ class Buffer
             if (bytes_num == -1) {
                 delete[] temp_buf;
                 if (errno == EAGAIN || errno == EWOULDBLOCK) {
-                    // printf("数据读取完毕!\n");
+                    // LOG_INFO("数据读取完毕!\n");
                     break;
                 }
 
@@ -46,7 +48,7 @@ class Buffer
                 // 对方关闭连接
                 delete[] temp_buf;
 
-                // printf("对方关闭连接!\n");
+                // LOG_INFO("对方关闭连接!");
                 return false;
             }
 
@@ -118,12 +120,39 @@ class Buffer
         }
     }
 
+    const char* Peek(size_t idx)
+    {
+        return &buf_[read_idx_ + idx];
+    }
+
+    size_t FindFirst(std::string target)
+    {
+        if (target.size() == 0) {
+            return write_idx_ - read_idx_;
+        }
+        for(size_t i = read_idx_; i < write_idx_; i++) {
+            if(buf_[i] == target[0]) {
+                bool flag = true;
+                for(size_t j = i; j < target.size(); j++) {
+                    if (buf_[j] != target[j - i]) {
+                        flag = false;
+                        break;
+                    }
+                }
+                if (flag) {
+                    return i - read_idx_;
+                }
+            }
+        }
+        return write_idx_ - read_idx_;
+    }
+
     char *GetData()
     {
         return &buf_[read_idx_];
     }
 
-    int GetLen()
+    size_t GetLen()
     {
         return write_idx_ - read_idx_;
     }
@@ -134,10 +163,34 @@ class Buffer
         total_size_ = buf_.capacity();
     }
 
+    void Clear(size_t begin_idx, size_t end_idx)
+    {
+        if (begin_idx >= GetLen() || end_idx > GetLen()) {
+            LOG_INFO("clear buffer exception read idx is %zu, write idx is %zu, capacity is %zu, total size is %d", read_idx_, write_idx_, buf_.capacity(), total_size_);
+            LOG_INFO("clear buffer exception begin idx is %zu, end_idx is %zu", begin_idx, end_idx);
+            throw std::exception();
+        }
+        if (begin_idx == 0) {
+            read_idx_ = read_idx_ + end_idx;
+        } else {
+            if (begin_idx < write_idx_ - read_idx_ - end_idx) {
+                for(size_t i = read_idx_ + begin_idx - 1; i >= 0; i--) {
+                    buf_[i + end_idx - begin_idx] = buf_[i];
+                }
+                read_idx_ = read_idx_ + (end_idx - begin_idx);
+            } else {
+                for(size_t i = read_idx_ + end_idx; i < write_idx_; i++) {
+                    buf_[i - (end_idx - begin_idx)] = buf_[i];
+                }
+                write_idx_ = write_idx_ - (end_idx - begin_idx);
+            }
+        }
+    }
+
  private:
     std::vector<char> buf_;
-    int read_idx_;
-    int write_idx_;
+    size_t read_idx_;
+    size_t write_idx_;
     int total_size_;
 };
 

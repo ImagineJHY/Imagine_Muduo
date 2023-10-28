@@ -591,6 +591,33 @@ imagine_log/fast:
 	$(MAKE) -f thirdparty/Imagine_Tool/Imagine_Log/CMakeFiles/imagine_log.dir/build.make thirdparty/Imagine_Tool/Imagine_Log/CMakeFiles/imagine_log.dir/build
 .PHONY : imagine_log/fast
 
+src/Acceptor.o: src/Acceptor.cpp.o
+
+.PHONY : src/Acceptor.o
+
+# target to build an object file
+src/Acceptor.cpp.o:
+	$(MAKE) -f CMakeFiles/imagine_muduo.dir/build.make CMakeFiles/imagine_muduo.dir/src/Acceptor.cpp.o
+.PHONY : src/Acceptor.cpp.o
+
+src/Acceptor.i: src/Acceptor.cpp.i
+
+.PHONY : src/Acceptor.i
+
+# target to preprocess a source file
+src/Acceptor.cpp.i:
+	$(MAKE) -f CMakeFiles/imagine_muduo.dir/build.make CMakeFiles/imagine_muduo.dir/src/Acceptor.cpp.i
+.PHONY : src/Acceptor.cpp.i
+
+src/Acceptor.s: src/Acceptor.cpp.s
+
+.PHONY : src/Acceptor.s
+
+# target to generate assembly for a file
+src/Acceptor.cpp.s:
+	$(MAKE) -f CMakeFiles/imagine_muduo.dir/build.make CMakeFiles/imagine_muduo.dir/src/Acceptor.cpp.s
+.PHONY : src/Acceptor.cpp.s
+
 src/Channel.o: src/Channel.cpp.o
 
 .PHONY : src/Channel.o
@@ -617,6 +644,33 @@ src/Channel.s: src/Channel.cpp.s
 src/Channel.cpp.s:
 	$(MAKE) -f CMakeFiles/imagine_muduo.dir/build.make CMakeFiles/imagine_muduo.dir/src/Channel.cpp.s
 .PHONY : src/Channel.cpp.s
+
+src/Connection.o: src/Connection.cpp.o
+
+.PHONY : src/Connection.o
+
+# target to build an object file
+src/Connection.cpp.o:
+	$(MAKE) -f CMakeFiles/imagine_muduo.dir/build.make CMakeFiles/imagine_muduo.dir/src/Connection.cpp.o
+.PHONY : src/Connection.cpp.o
+
+src/Connection.i: src/Connection.cpp.i
+
+.PHONY : src/Connection.i
+
+# target to preprocess a source file
+src/Connection.cpp.i:
+	$(MAKE) -f CMakeFiles/imagine_muduo.dir/build.make CMakeFiles/imagine_muduo.dir/src/Connection.cpp.i
+.PHONY : src/Connection.cpp.i
+
+src/Connection.s: src/Connection.cpp.s
+
+.PHONY : src/Connection.s
+
+# target to generate assembly for a file
+src/Connection.cpp.s:
+	$(MAKE) -f CMakeFiles/imagine_muduo.dir/build.make CMakeFiles/imagine_muduo.dir/src/Connection.cpp.s
+.PHONY : src/Connection.cpp.s
 
 src/EventLoop.o: src/EventLoop.cpp.o
 
@@ -672,6 +726,87 @@ src/Poller.cpp.s:
 	$(MAKE) -f CMakeFiles/imagine_muduo.dir/build.make CMakeFiles/imagine_muduo.dir/src/Poller.cpp.s
 .PHONY : src/Poller.cpp.s
 
+src/Server.o: src/Server.cpp.o
+
+.PHONY : src/Server.o
+
+# target to build an object file
+src/Server.cpp.o:
+	$(MAKE) -f CMakeFiles/imagine_muduo.dir/build.make CMakeFiles/imagine_muduo.dir/src/Server.cpp.o
+.PHONY : src/Server.cpp.o
+
+src/Server.i: src/Server.cpp.i
+
+.PHONY : src/Server.i
+
+# target to preprocess a source file
+src/Server.cpp.i:
+	$(MAKE) -f CMakeFiles/imagine_muduo.dir/build.make CMakeFiles/imagine_muduo.dir/src/Server.cpp.i
+.PHONY : src/Server.cpp.i
+
+src/Server.s: src/Server.cpp.s
+
+.PHONY : src/Server.s
+
+# target to generate assembly for a file
+src/Server.cpp.s:
+	$(MAKE) -f CMakeFiles/imagine_muduo.dir/build.make CMakeFiles/imagine_muduo.dir/src/Server.cpp.s
+.PHONY : src/Server.cpp.s
+
+src/TcpConnection.o: src/TcpConnection.cpp.o
+
+.PHONY : src/TcpConnection.o
+
+# target to build an object file
+src/TcpConnection.cpp.o:
+	$(MAKE) -f CMakeFiles/imagine_muduo.dir/build.make CMakeFiles/imagine_muduo.dir/src/TcpConnection.cpp.o
+.PHONY : src/TcpConnection.cpp.o
+
+src/TcpConnection.i: src/TcpConnection.cpp.i
+
+.PHONY : src/TcpConnection.i
+
+# target to preprocess a source file
+src/TcpConnection.cpp.i:
+	$(MAKE) -f CMakeFiles/imagine_muduo.dir/build.make CMakeFiles/imagine_muduo.dir/src/TcpConnection.cpp.i
+.PHONY : src/TcpConnection.cpp.i
+
+src/TcpConnection.s: src/TcpConnection.cpp.s
+
+.PHONY : src/TcpConnection.s
+
+# target to generate assembly for a file
+src/TcpConnection.cpp.s:
+	$(MAKE) -f CMakeFiles/imagine_muduo.dir/build.make CMakeFiles/imagine_muduo.dir/src/TcpConnection.cpp.s
+.PHONY : src/TcpConnection.cpp.s
+
+src/TcpServer.o: src/TcpServer.cpp.o
+
+.PHONY : src/TcpServer.o
+
+# target to build an object file
+src/TcpServer.cpp.o:
+	$(MAKE) -f CMakeFiles/imagine_muduo.dir/build.make CMakeFiles/imagine_muduo.dir/src/TcpServer.cpp.o
+.PHONY : src/TcpServer.cpp.o
+
+src/TcpServer.i: src/TcpServer.cpp.i
+
+.PHONY : src/TcpServer.i
+
+# target to preprocess a source file
+src/TcpServer.cpp.i:
+	$(MAKE) -f CMakeFiles/imagine_muduo.dir/build.make CMakeFiles/imagine_muduo.dir/src/TcpServer.cpp.i
+.PHONY : src/TcpServer.cpp.i
+
+src/TcpServer.s: src/TcpServer.cpp.s
+
+.PHONY : src/TcpServer.s
+
+# target to generate assembly for a file
+src/TcpServer.cpp.s:
+	$(MAKE) -f CMakeFiles/imagine_muduo.dir/build.make CMakeFiles/imagine_muduo.dir/src/TcpServer.cpp.s
+.PHONY : src/TcpServer.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -717,15 +852,30 @@ help:
 	@echo "... yaml-cpp-parse"
 	@echo "... imagine_time"
 	@echo "... imagine_log"
+	@echo "... src/Acceptor.o"
+	@echo "... src/Acceptor.i"
+	@echo "... src/Acceptor.s"
 	@echo "... src/Channel.o"
 	@echo "... src/Channel.i"
 	@echo "... src/Channel.s"
+	@echo "... src/Connection.o"
+	@echo "... src/Connection.i"
+	@echo "... src/Connection.s"
 	@echo "... src/EventLoop.o"
 	@echo "... src/EventLoop.i"
 	@echo "... src/EventLoop.s"
 	@echo "... src/Poller.o"
 	@echo "... src/Poller.i"
 	@echo "... src/Poller.s"
+	@echo "... src/Server.o"
+	@echo "... src/Server.i"
+	@echo "... src/Server.s"
+	@echo "... src/TcpConnection.o"
+	@echo "... src/TcpConnection.i"
+	@echo "... src/TcpConnection.s"
+	@echo "... src/TcpServer.o"
+	@echo "... src/TcpServer.i"
+	@echo "... src/TcpServer.s"
 .PHONY : help
 
 

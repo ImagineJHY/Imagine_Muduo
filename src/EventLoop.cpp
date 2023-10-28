@@ -28,7 +28,7 @@ EventLoop::EventLoop(YAML::Node config) : EventLoop()
     Init(config);
 }
 
-EventLoop::EventLoop(int port, int thread_num, int max_channel, EventCallback read_cb, EventCallback write_cb, EventCommunicateCallback communicate_cb)
+EventLoop::EventLoop(int port, int thread_num, int max_channel, ChannelCallback read_cb, ChannelCallback write_cb, EventCommunicateCallback communicate_cb)
                  : thread_num_(thread_num), quit_(0), channel_num_(0), max_channel_num_(max_channel), read_callback_(read_cb), write_callback_(write_cb), communicate_callback_(communicate_cb), epoll_(new EpollPoller(this)), timer_channel_(Channel::Create(this, 0, Channel::ChannelTyep::TimerChannel))
 {
     InitLoop();
@@ -45,12 +45,8 @@ void EventLoop::Init(std::string profile_name)
     if (profile_name == "") {
         throw std::exception();
     }
-
     YAML::Node config = YAML::LoadFile(profile_name);
     Init(config);
-
-    InitProfilePath(profile_name);
-    GenerateSubmoduleProfile(config);
 }
 
 void EventLoop::Init(YAML::Node config)
@@ -147,6 +143,7 @@ void EventLoop::loop()
 
     if (pthread_detach(*destroy_thread_)) {
         delete[] destroy_thread_;
+        LOG_INFO("destroy exception");
         throw std::exception();
     }
 
@@ -201,6 +198,11 @@ void EventLoop::AddChannelnum()
     channel_num_++;
 }
 
+std::shared_ptr<Channel> EventLoop::GetListenChannel() const
+{
+    return listen_channel_;
+}
+
 int EventLoop::GetMaxchannelnum()
 {
     return max_channel_num_;
@@ -211,12 +213,12 @@ Poller *EventLoop::GetEpoll()
     return epoll_;
 }
 
-EventCallback EventLoop::GetReadCallback()
+ChannelCallback EventLoop::GetReadCallback()
 {
     return read_callback_;
 }
 
-EventCallback EventLoop::GetWriteCallback()
+ChannelCallback EventLoop::GetWriteCallback()
 {
     return write_callback_;
 }
@@ -226,12 +228,12 @@ EventCommunicateCallback EventLoop::GetCommunicateCallback()
     return communicate_callback_;
 }
 
-void EventLoop::SetReadCallback(EventCallback read_callback)
+void EventLoop::SetReadCallback(ChannelCallback read_callback)
 {
     read_callback_ = read_callback;
 }
 
-void EventLoop::SetWriteCallback(EventCallback write_callback)
+void EventLoop::SetWriteCallback(ChannelCallback write_callback)
 {
     write_callback_ = write_callback;
 }
@@ -266,11 +268,12 @@ void EventLoop::DestroyClosedChannel()
 {
     while (close_list_.size()) {
         pthread_mutex_lock(&destroy_lock_);
-        // printf("im destroyChannel!\n");
-        Channel::Destroy(close_list_.back());
+        std::shared_ptr<Channel> del_channel = close_list_.back();
         close_list_.back().reset();
         close_list_.pop_back();
         pthread_mutex_unlock(&destroy_lock_);
+        // printf("im destroyChannel!\n");
+        Channel::Destroy(del_channel);
     }
 }
 
@@ -298,6 +301,7 @@ bool EventLoop::CloseTimer(long long timer_id)
     // printf("timerid is %lld\n",timer_id);
     std::unordered_map<long long, Imagine_Tool::Timer *>::iterator it = timer_map_.find(timer_id);
     if (it == timer_map_.end()) {
+        LOG_INFO("closeTimer exception");
         throw std::exception();
     }
     it->second->Close();

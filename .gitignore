@@ -4,6 +4,8 @@
 /build/CMakeCache.txt
 /build/cmake_install.cmake
 
+# test
+/test/
 
 # thirdparty
 /thirdparty

@@ -5,6 +5,6 @@ log_name: imagine_log_profile.yaml
 log_path: /home/imagine/MIT6824/Imagine_Muduo/config/
 max_log_file_size: 104857600
 async_log: false
-singleton_log_mode: false
+singleton_log_mode: true
 log_title: Imagine Muduo
 log_with_timestamp: true

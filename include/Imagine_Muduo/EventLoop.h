@@ -6,6 +6,7 @@
 #include "Imagine_Log/SingletonLogger.h"
 #include "Imagine_Log/NonSingletonLogger.h"
 #include "Imagine_Muduo/ThreadPool.h"
+#include "Imagine_Muduo/Poller.h"
 #include "Imagine_Muduo/common_definition.h"
 
 #include <pthread.h>
@@ -35,7 +36,7 @@ class EventLoop
 
    EventLoop(YAML::Node config);
 
-   EventLoop(int port, int thread_num = 10, int max_channel = 10000, EventCallback read_cb = nullptr, EventCallback write_cb = nullptr, EventCommunicateCallback communicate_cb = nullptr);
+   EventLoop(int port, int thread_num = 10, int max_channel = 10000, ChannelCallback read_cb = nullptr, ChannelCallback write_cb = nullptr, EventCommunicateCallback communicate_cb = nullptr);
 
    ~EventLoop();
 
@@ -63,19 +64,21 @@ class EventLoop
 
    void AddChannelnum();
 
+   std::shared_ptr<Channel> GetListenChannel() const;
+
    int GetMaxchannelnum();
 
    Poller *GetEpoll();
 
-   EventCallback GetReadCallback();
+   ChannelCallback GetReadCallback();
 
-   EventCallback GetWriteCallback();
+   ChannelCallback GetWriteCallback();
 
    EventCommunicateCallback GetCommunicateCallback();
 
-   void SetReadCallback(EventCallback read_callback_);
+   void SetReadCallback(ChannelCallback read_callback_);
 
-   void SetWriteCallback(EventCallback write_callback_);
+   void SetWriteCallback(ChannelCallback write_callback_);
 
    void SetCommunicateCallback(EventCommunicateCallback communicate_callback);
 
@@ -127,8 +130,8 @@ class EventLoop
    pthread_t *destroy_thread_;
    pthread_mutex_t destroy_lock_;
    int channel_num_;           // 当前连接的客户端数目
-   EventCallback read_callback_;
-   EventCallback write_callback_;
+   ChannelCallback read_callback_;
+   ChannelCallback write_callback_;
    EventCommunicateCallback communicate_callback_ = nullptr;
    Poller *epoll_;
    // vector<Channel*> channels_;

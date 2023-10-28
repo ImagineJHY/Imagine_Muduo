@@ -15,7 +15,6 @@ class EventLoop;
 
 class Poller
 {
-
  public:
     virtual void poll(int timeoutMs, std::vector<std::shared_ptr<Channel>> *active_channels) = 0;
     virtual ~Poller(){};

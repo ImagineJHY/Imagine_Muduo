@@ -1,6 +1,9 @@
 #ifndef IMAGINE_MUDUO_CHANNEL_H
 #define IMAGINE_MUDUO_CHANNEL_H
 
+#include "Imagine_Muduo/EventLoop.h"
+#include "Imagine_Muduo/Buffer.h"
+
 #include <string>
 #include <functional>
 #include <sys/epoll.h>
@@ -9,9 +12,6 @@
 #include <sys/types.h>
 #include <fcntl.h>
 #include <algorithm>
-
-#include "Imagine_Muduo/EventLoop.h"
-#include "Imagine_Muduo/Buffer.h"
 
 namespace Imagine_Muduo
 {
@@ -35,13 +35,13 @@ class Channel
 
     void MakeSelf(std::shared_ptr<Channel> self);
 
-    void SetReadCallback(EventCallback callback);
+    void SetReadCallback(ChannelCallback callback);
 
-    void SetWriteCallback(EventCallback callback);
+    void SetWriteCallback(ChannelCallback callback);
 
-    void SetCloseCallback(EventCallback callback);
+    void SetCloseCallback(ChannelCallback callback);
 
-    void SetErrorCallback(EventCallback callback);
+    void SetErrorCallback(ChannelCallback callback);
 
     void SetCommunicateCallback(EventCommunicateCallback callback);
 
@@ -108,6 +108,10 @@ class Channel
 
     void DefaultEventfdWriteEventHandler();
 
+    void SetReadHandler(EventHandler read_handler);
+
+    void SetWriteHandler(EventHandler write_handler);
+
     bool SetEventHandler(EventHandler handler);
 
     bool SetReadEventHandler(EventHandler read_handler);
@@ -129,10 +133,10 @@ class Channel
     EventLoop *loop_;
     std::shared_ptr<Channel> self_;
 
-    EventCallback read_callback_ = nullptr;
-    EventCallback write_callback_ = nullptr;
-    EventCallback close_callback_ = nullptr;
-    EventCallback error_callback_ = nullptr;
+    ChannelCallback read_callback_ = nullptr;
+    ChannelCallback write_callback_ = nullptr;
+    ChannelCallback close_callback_ = nullptr;
+    ChannelCallback error_callback_ = nullptr;
 
     EventCommunicateCallback communicate_callback_ = nullptr;
 
