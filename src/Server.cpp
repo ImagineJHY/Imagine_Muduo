@@ -42,6 +42,20 @@ void Server::Start()
     loop_->loop();
 }
 
+Server* const Server::SetTimer(Imagine_Tool::TimerCallback timer_callback, double interval, double delay)
+{
+    loop_->SetTimer(timer_callback, interval, delay);
+
+    return this;
+}
+
+Server* const Server::RemoveTimer(long long timerfd)
+{
+    loop_->CloseTimer(timerfd);
+
+    return this;
+}
+
 Server* const Server::AddAndSetConnection(Connection* new_conn)
 {
     SetReadCallback(new_conn);

@@ -210,7 +210,7 @@ std::shared_ptr<Channel> Channel::Create(EventLoop *loop, int value, ChannelTyep
         events = EPOLLIN | EPOLLRDHUP | EPOLLONESHOT;
     } else if (type == TimerChannel) { // 创建timerChannel
 
-        // new_channel->SetReadEventHandler(std::bind(&Channel::DefaultTimerfdReadEventHandler, new_channel.get()));
+        new_channel->SetReadEventHandler(std::bind(&Channel::DefaultTimerfdReadEventHandler, new_channel.get()));
         sockfd = Imagine_Tool::TimeUtil::CreateTimer();
         setsockopt(sockfd, SOL_SOCKET, SO_REUSEPORT, &reuse, sizeof(reuse)); // 设置端口复用
         events = EPOLLIN | EPOLLRDHUP | EPOLLONESHOT | EPOLLET;
@@ -444,7 +444,7 @@ void Channel::DefaultEventfdReadEventHandler()
 
 void Channel::DefaultTimerfdReadEventHandler()
 {
-    Imagine_Tool::TimeStamp now(Imagine_Tool::TimeUtil::GetNow());
+    Imagine_Tool::TimeStamp now(NOW_MS);
     Imagine_Tool::TimeUtil::ReadTimerfd(this->Getfd());
     // printf("after reading timer!\n");
     std::vector<Imagine_Tool::Timer *> expired_timers = this->GetLoop()->GetExpiredTimers(now);

@@ -28,6 +28,10 @@ class Server
 
     virtual void DefaultWriteCallback(Connection* conn) = 0;
 
+    Server* const SetTimer(Imagine_Tool::TimerCallback timer_callback, double interval, double delay = 0.0);
+
+    Server* const RemoveTimer(long long timerfd);
+
     Server* const AddAndSetConnection(Connection* new_conn);
 
     Server* const AddConnection(Connection* new_conn);
