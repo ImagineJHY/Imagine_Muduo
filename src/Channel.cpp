@@ -90,19 +90,19 @@ int Channel::GetEvents()
 
 void Channel::InitIovec(struct iovec *read_str, struct sockaddr_in *addr, bool get_read_buf)
 {
-    read_str[0].iov_base = &fd_;
-    read_str[0].iov_len = 3;
-    socklen_t addr_size = sizeof(*addr);
-    getpeername(fd_, (struct sockaddr *)addr, &addr_size);
-    read_str[1].iov_base = addr;
-    read_str[1].iov_len = addr_size;
-    if (get_read_buf) {
-        read_str[2].iov_base = read_buffer_.GetData();
-        read_str[2].iov_len = read_buffer_.GetLen();
-    } else {
-        read_str[2].iov_base = write_buffer_.GetData();
-        read_str[2].iov_len = write_buffer_.GetLen();
-    }
+    // read_str[0].iov_base = &fd_;
+    // read_str[0].iov_len = 3;
+    // socklen_t addr_size = sizeof(*addr);
+    // getpeername(fd_, (struct sockaddr *)addr, &addr_size);
+    // read_str[1].iov_base = addr;
+    // read_str[1].iov_len = addr_size;
+    // if (get_read_buf) {
+    //     read_str[2].iov_base = read_buffer_.GetData();
+    //     read_str[2].iov_len = read_buffer_.GetLen();
+    // } else {
+    //     read_str[2].iov_base = write_buffer_.GetData();
+    //     read_str[2].iov_len = write_buffer_.GetLen();
+    // }
 }
 
 void Channel::ProcessIovec(struct iovec *io_block)
