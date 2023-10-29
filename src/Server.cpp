@@ -42,11 +42,9 @@ void Server::Start()
     loop_->loop();
 }
 
-Server* const Server::SetTimer(Imagine_Tool::TimerCallback timer_callback, double interval, double delay)
+long long Server::SetTimer(Imagine_Tool::TimerCallback timer_callback, double interval, double delay)
 {
-    loop_->SetTimer(timer_callback, interval, delay);
-
-    return this;
+    return loop_->SetTimer(timer_callback, interval, delay);
 }
 
 Server* const Server::RemoveTimer(long long timerfd)
