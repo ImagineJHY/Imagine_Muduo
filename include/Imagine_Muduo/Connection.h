@@ -114,6 +114,10 @@ class Connection
 
    Connection* const Close();
 
+   size_t const GetUseCount() const;
+
+   Connection* const Reset();
+
  protected:
    Connection* const ResetRecvTime();
 

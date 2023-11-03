@@ -30,15 +30,40 @@ void Server::Init()
         read_callback_ = std::bind(&Connection::DefaultReadCallback, msg_conn_, std::placeholders::_1);
         write_callback_ = std::bind(&Connection::DefaultWriteCallback, msg_conn_, std::placeholders::_1);
     }
+
     if (loop_ != nullptr) {
         Connection*  old_acceptor = acceptor_;
         acceptor_ = acceptor_->Create(loop_->GetListenChannel());
         delete old_acceptor;
     }
+
+    destroy_thread_ = new pthread_t;
+    if (!destroy_thread_) {
+        throw std::exception();
+    }
 }
 
 void Server::Start()
 {
+    if (pthread_create(destroy_thread_, nullptr, [](void *argv) -> void *
+        {
+            Server* server = (Server*)argv;
+            while(1) {
+                server->DestroyConnection();
+            }
+
+            return nullptr;
+        }, this) != 0) {
+        delete[] destroy_thread_;
+        LOG_INFO("loop exception!");
+        throw std::exception();
+    }
+
+    if (pthread_detach(*destroy_thread_)) {
+        delete[] destroy_thread_;
+        LOG_INFO("destroy exception");
+        throw std::exception();
+    }
     loop_->loop();
 }
 
@@ -89,6 +114,20 @@ Connection* Server::GetMessageConnection() const
     return msg_conn_;
 }
 
+void Server::DestroyConnection()
+{
+    while(close_list_.size()) {
+        pthread_mutex_lock(&destroy_lock_);
+        Connection* del_connection = close_list_.back();
+        close_list_.pop_back();
+        pthread_mutex_unlock(&destroy_lock_);
+        while(del_connection->GetUseCount() > 1);
+        LOG_INFO("Connection Use Count is 1");
+        del_connection->Reset();
+        delete del_connection;
+    }
+}
+
 Server* const Server::CloseConnection(std::string ip, std::string port)
 {
     Connection* del_conn = RemoveConnection(ip, port);
@@ -104,7 +143,10 @@ Connection* const Server::RemoveConnection(std::string ip, std::string port)
     std::unique_lock<std::mutex> lock(map_lock_);
     auto it = conn_map_.find(std::make_pair(ip, port));
     if (it != conn_map_.end()) {
+        pthread_mutex_lock(&destroy_lock_);
+        close_list_.push_back(it->second);
         conn_map_.erase(it);
+        pthread_mutex_unlock(&destroy_lock_);
 
         return it->second;
     }

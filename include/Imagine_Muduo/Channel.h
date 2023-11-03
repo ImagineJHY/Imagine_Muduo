@@ -144,11 +144,6 @@ class Channel
     EventHandler read_handler_ = nullptr;
     EventHandler write_handler_ = nullptr;
 
-    Buffer read_buffer_;
-    Buffer write_buffer_;
-
-    struct iovec *read_iovec_;
-    struct iovec *write_iovec_ = nullptr;
     bool write_flag_ = false;          // 标识写是否完成
     bool write_callback_flag_ = false; // 标识是否执行过write_callback
 };

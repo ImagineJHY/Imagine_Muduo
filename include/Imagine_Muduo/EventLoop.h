@@ -89,8 +89,6 @@ class EventLoop
    // 心跳检测根据fd删除channel用
    void Closefd(int fd);
 
-   void DestroyClosedChannel();
-
    /*
    -所有的时间参数都是以秒为单位，并且是从loop开始的相对时间
    -delay_表示首次开始执行的延时时间,为0表示从当前开始每interval_时间执行一次
@@ -126,9 +124,6 @@ class EventLoop
  private:
    bool quit_;
    ThreadPool<std::shared_ptr<Channel>> *pool_;
-   std::list<std::shared_ptr<Channel>> close_list_;
-   pthread_t *destroy_thread_;
-   pthread_mutex_t destroy_lock_;
    int channel_num_;           // 当前连接的客户端数目
    ChannelCallback read_callback_;
    ChannelCallback write_callback_;

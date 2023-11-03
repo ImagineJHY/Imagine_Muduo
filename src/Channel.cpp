@@ -307,7 +307,7 @@ bool Channel::Send(struct iovec *data, int len)
 
 Channel::~Channel() noexcept
 {
-    // LOG_INFO("remove channel!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!%p", this);
+    LOG_INFO("Delete Channel");
 }
 
 void Channel::HandleEvent()

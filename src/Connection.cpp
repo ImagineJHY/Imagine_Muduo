@@ -267,8 +267,19 @@ Connection* const Connection::SetWriteCallback(ConnectionCallback write_callback
 Connection* const Connection::Close()
 {
     channel_->Close();
-    channel_.reset();
     server_->RemoveConnection(ip_, port_);
+
+    return nullptr;
+}
+
+size_t const Connection::GetUseCount() const
+{
+    return channel_.use_count();
+}
+
+Connection* const Connection::Reset()
+{
+    channel_.reset();
 
     return this;
 }

@@ -102,15 +102,6 @@ void EventLoop::InitLoop()
         throw std::exception();
     }
 
-    destroy_thread_ = new pthread_t;
-    if (!destroy_thread_) {
-        throw std::exception();
-    }
-
-    if (pthread_mutex_init(&destroy_lock_, nullptr) != 0) {
-        throw std::exception();
-    }
-
     if (pthread_mutex_init(&timer_lock_, nullptr) != 0) {
         throw std::exception();
     }
@@ -125,31 +116,6 @@ void EventLoop::InitLoop()
 
 void EventLoop::loop()
 {
-    if (pthread_create(
-            destroy_thread_, nullptr, [](void *argv) -> void *
-            {
-                EventLoop* loop = (EventLoop*)argv;
-                while(1){
-                    loop->DestroyClosedChannel();
-                }
-
-                return nullptr;
-            },
-            this) != 0) {
-        delete[] destroy_thread_;
-        LOG_INFO("loop exception!");
-        throw std::exception();
-    }
-
-    if (pthread_detach(*destroy_thread_)) {
-        delete[] destroy_thread_;
-        LOG_INFO("destroy exception");
-        throw std::exception();
-    }
-
-    // epoll->AddChannel(listen_channel);
-    // epoll->AddChannel(timer_channel);
-
     while (!quit_) {
         std::vector<std::shared_ptr<Channel>> active_channels;
         epoll_->poll(-1, &active_channels);
@@ -250,31 +216,16 @@ void EventLoop::UpdateChannel(std::shared_ptr<Channel> channel)
 
 void EventLoop::Close(std::shared_ptr<Channel> channel)
 {
-    if (channel.get() == nullptr)
+    if (channel.get() == nullptr) {
         return;
+    }
     channel_num_--;
     epoll_->DelChannel(channel);
-    pthread_mutex_lock(&destroy_lock_);
-    close_list_.push_back(channel);
-    pthread_mutex_unlock(&destroy_lock_);
 }
 
 void EventLoop::Closefd(int fd)
 {
     Close(epoll_->FindChannel(fd));
-}
-
-void EventLoop::DestroyClosedChannel()
-{
-    while (close_list_.size()) {
-        pthread_mutex_lock(&destroy_lock_);
-        std::shared_ptr<Channel> del_channel = close_list_.back();
-        close_list_.back().reset();
-        close_list_.pop_back();
-        pthread_mutex_unlock(&destroy_lock_);
-        // printf("im destroyChannel!\n");
-        Channel::Destroy(del_channel);
-    }
 }
 
 long long EventLoop::SetTimer(Imagine_Tool::TimerCallback timer_callback, double interval, double delay)
