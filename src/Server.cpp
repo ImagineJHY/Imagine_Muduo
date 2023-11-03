@@ -133,6 +133,9 @@ Server* const Server::CloseConnection(std::string ip, std::string port)
     Connection* del_conn = RemoveConnection(ip, port);
     if (del_conn != nullptr) {
         del_conn->Close();
+        pthread_mutex_lock(&destroy_lock_);
+        close_list_.push_back(del_conn);
+        pthread_mutex_unlock(&destroy_lock_);
     }
 
     return this;
@@ -143,10 +146,7 @@ Connection* const Server::RemoveConnection(std::string ip, std::string port)
     std::unique_lock<std::mutex> lock(map_lock_);
     auto it = conn_map_.find(std::make_pair(ip, port));
     if (it != conn_map_.end()) {
-        pthread_mutex_lock(&destroy_lock_);
-        close_list_.push_back(it->second);
         conn_map_.erase(it);
-        pthread_mutex_unlock(&destroy_lock_);
 
         return it->second;
     }

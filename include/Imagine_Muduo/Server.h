@@ -46,6 +46,7 @@ class Server
 
    Server* const CloseConnection(std::string ip, std::string port);
 
+ private:
    Connection* const RemoveConnection(std::string ip, std::string port);
 
  private:

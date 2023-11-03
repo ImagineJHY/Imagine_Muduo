@@ -267,7 +267,6 @@ Connection* const Connection::SetWriteCallback(ConnectionCallback write_callback
 Connection* const Connection::Close()
 {
     channel_->Close();
-    server_->RemoveConnection(ip_, port_);
 
     return nullptr;
 }
@@ -300,7 +299,7 @@ Connection* const Connection::UpdateRevent()
         write_buffer_.Clear();
     }
     if (!keep_alive_) {
-        Close();
+        server_->CloseConnection(ip_, port_);
         return this;
     }
     switch (next_event_) {
@@ -311,7 +310,7 @@ Connection* const Connection::UpdateRevent()
             channel_->SetEvents(EPOLLOUT | EPOLLONESHOT | EPOLLRDHUP);
             break;
         default:
-            Close();
+            server_->CloseConnection(ip_, port_);
     }
     
     return this;
