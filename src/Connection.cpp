@@ -140,6 +140,11 @@ Connection* const Connection::ClearMessageFormat()
     return this;
 }
 
+int Connection::GetSockfd() const
+{
+    return channel_->Getfd();
+}
+
 Connection* Connection::SetIp(const std::string& ip)
 {
     ip_ = ip;

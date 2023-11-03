@@ -72,6 +72,8 @@ class Connection
 
    Connection* const ClearMessageFormat();
 
+   int GetSockfd() const;
+
    Connection* SetIp(const std::string& ip);
 
    std::string GetIp() const;
