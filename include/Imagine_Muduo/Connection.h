@@ -102,6 +102,8 @@ class Connection
 
    Connection* const SetRevent(Event revent);
 
+   Connection* const SetMessageEndIdx(size_t msg_end_idx);
+
    Connection* const IsTakeNextMessage(bool get_next_msg);
 
    Connection* const IsClearReadBuffer(bool is_clear);

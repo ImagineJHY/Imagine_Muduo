@@ -105,7 +105,9 @@ void Connection::ProcessRead()
     do {
         PackageCoalescingDetector();
         read_callback_(this);
-        read_buffer_.Clear(msg_begin_idx_, msg_end_idx_);
+        if (clear_read_buffer_) {
+            read_buffer_.Clear(msg_begin_idx_, msg_end_idx_);
+        }
     } while (get_next_msg_);
     UpdateRevent();
 }
@@ -113,6 +115,10 @@ void Connection::ProcessRead()
 void Connection::ProcessWrite()
 {
     write_callback_(this);
+    write_buffer_.Write(channel_->Getfd());
+    if (clear_write_buffer_) {
+        write_buffer_.Clear();
+    }
     UpdateRevent();
 }
 
@@ -225,6 +231,16 @@ Connection* const Connection::SetAlive(bool keep_alive)
 Connection* const Connection::SetRevent(Connection::Event revent)
 {
     next_event_ = revent;
+
+    return this;
+}
+
+Connection* const Connection::SetMessageEndIdx(size_t msg_end_idx)
+{
+    if (msg_end_idx < msg_begin_idx_ || read_buffer_.GetLen() < msg_end_idx) {
+        throw std::exception();
+    }
+    msg_end_idx_ = msg_end_idx;
 
     return this;
 }
