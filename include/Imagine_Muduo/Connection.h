@@ -15,6 +15,7 @@ class Server;
 
 class Connection
 {
+ public:
    enum class MessageFormat{
       None = 0,
       FixedLenth,
