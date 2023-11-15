@@ -308,12 +308,6 @@ Connection* const Connection::ResetRecvTime()
 
 Connection* const Connection::UpdateRevent()
 {
-    if (clear_read_buffer_) {
-        read_buffer_.Clear();
-    }
-    if (clear_write_buffer_) {
-        write_buffer_.Clear();
-    }
     if (!keep_alive_) {
         server_->CloseConnection(ip_, port_);
         return this;
@@ -327,6 +321,7 @@ Connection* const Connection::UpdateRevent()
             break;
         default:
             server_->CloseConnection(ip_, port_);
+            break;
     }
     
     return this;
