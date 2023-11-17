@@ -174,7 +174,7 @@ class Buffer
             read_idx_ = read_idx_ + end_idx;
         } else {
             if (begin_idx < write_idx_ - read_idx_ - end_idx) {
-                for(size_t i = read_idx_ + begin_idx - 1; i >= 0; i--) {
+                for(size_t i = read_idx_ + begin_idx - 1; i >= read_idx_; i--) {
                     buf_[i + end_idx - begin_idx] = buf_[i];
                 }
                 read_idx_ = read_idx_ + (end_idx - begin_idx);
