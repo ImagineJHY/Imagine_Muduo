@@ -177,6 +177,16 @@ std::string Connection::GetPort() const
     return port_;
 }
 
+std::string Connection::GetPeerIp() const
+{
+    return channel_->GetPeerIp();
+}
+
+std::string Connection::GetPeerPort() const
+{
+    return channel_->GetPeerPort();
+}
+
 Server* Connection::GetServer() const
 {
     return server_;

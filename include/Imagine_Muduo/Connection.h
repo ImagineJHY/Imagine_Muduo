@@ -83,6 +83,10 @@ class Connection
 
    std::string GetPort() const;
 
+   std::string GetPeerIp() const;
+
+   std::string GetPeerPort() const;
+
    Server* GetServer() const;
 
    Connection* const SetServer(Server* const server);

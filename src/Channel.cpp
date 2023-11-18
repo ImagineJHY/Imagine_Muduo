@@ -88,21 +88,23 @@ int Channel::GetEvents()
     return events_;
 }
 
-void Channel::InitIovec(struct iovec *read_str, struct sockaddr_in *addr, bool get_read_buf)
+std::string Channel::GetPeerIp() const
 {
-    // read_str[0].iov_base = &fd_;
-    // read_str[0].iov_len = 3;
-    // socklen_t addr_size = sizeof(*addr);
-    // getpeername(fd_, (struct sockaddr *)addr, &addr_size);
-    // read_str[1].iov_base = addr;
-    // read_str[1].iov_len = addr_size;
-    // if (get_read_buf) {
-    //     read_str[2].iov_base = read_buffer_.GetData();
-    //     read_str[2].iov_len = read_buffer_.GetLen();
-    // } else {
-    //     read_str[2].iov_base = write_buffer_.GetData();
-    //     read_str[2].iov_len = write_buffer_.GetLen();
-    // }
+    return peer_ip_;
+}
+
+std::string Channel::GetPeerPort() const
+{
+    return peer_port_;
+}
+
+void Channel::ParsePeerAddr()
+{
+    struct sockaddr_in addr;
+    socklen_t addr_size = sizeof(&addr);
+    getpeername(fd_, (struct sockaddr *)&addr, &addr_size);
+    peer_ip_ = std::to_string(ntohl(addr.sin_addr.s_addr));
+    peer_port_ = std::to_string(ntohs(addr.sin_port));
 }
 
 void Channel::ProcessIovec(struct iovec *io_block)

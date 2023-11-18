@@ -47,6 +47,7 @@ void Acceptor::ReadHandler()
         if (channel == nullptr) {
             return;
         }
+        channel->ParsePeerAddr();
         Connection* new_conn = CreateMessageConnection(channel);
         if (server_ != nullptr) {
             server_->AddAndSetConnection(new_conn);

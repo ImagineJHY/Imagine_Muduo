@@ -61,11 +61,15 @@ class Channel
 
     int GetEvents();
 
+    std::string GetPeerIp() const;
+
+    std::string GetPeerPort() const;
+
     // void HandleEvent();
 
     bool Process();
 
-    void InitIovec(struct iovec *read_str, struct sockaddr_in *addr, bool get_read_buf = true);
+    void ParsePeerAddr();
 
     void ProcessIovec(struct iovec *io_block);
 
@@ -132,6 +136,9 @@ class Channel
     struct sockaddr_in client_addr_;
     EventLoop *loop_;
     std::shared_ptr<Channel> self_;
+
+    std::string peer_ip_;
+    std::string peer_port_;
 
     ChannelCallback read_callback_ = nullptr;
     ChannelCallback write_callback_ = nullptr;
