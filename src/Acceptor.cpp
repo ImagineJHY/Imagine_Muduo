@@ -66,7 +66,6 @@ void Acceptor::WriteHandler()
 
 void Acceptor::DefaultReadCallback(Connection* conn)
 {
-    LOG_INFO("hhhhhhhhhh");
     std::shared_ptr<Channel> channel = Channel::Create(loop_, channel_->Getfd());
     if (channel == nullptr) {
         return;
