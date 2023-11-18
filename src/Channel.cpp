@@ -339,12 +339,6 @@ void Channel::DefaultEventHandler()
     */
 
     // printf("\n\n\nim processing!fd():%d\n",fd);
-    if (revents_ & EPOLLIN) {
-        LOG_INFO("condition1 ok");
-    }
-    if (read_handler_) {
-        LOG_INFO("condition2 ok");
-    }
     if ((revents_ & EPOLLIN) && read_handler_) {
         read_handler_();
     } else if ((revents_ & EPOLLOUT) && write_handler_) {
