@@ -63,6 +63,7 @@ class Buffer
     int Write(int fd)
     {
         LOG_INFO("this is write func!");
+        LOG_INFO("write idx is %d, read_idx is %d", write_idx_, read_idx_);
         write(fd, &(buf_[read_idx_]), write_idx_ - read_idx_);
 
         return 0;
