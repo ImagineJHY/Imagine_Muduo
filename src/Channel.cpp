@@ -103,7 +103,7 @@ void Channel::ParsePeerAddr()
     struct sockaddr_in addr;
     socklen_t addr_size = sizeof(&addr);
     getpeername(fd_, (struct sockaddr *)&addr, &addr_size);
-    peer_ip_ = std::to_string(ntohl(addr.sin_addr.s_addr));
+    peer_ip_ = inet_ntoa(addr.sin_addr);
     peer_port_ = std::to_string(ntohs(addr.sin_port));
 }
 
