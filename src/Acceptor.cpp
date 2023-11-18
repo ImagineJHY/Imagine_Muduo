@@ -48,7 +48,6 @@ void Acceptor::ReadHandler()
             return;
         }
         channel->ParsePeerAddr();
-        LOG_INFO("%s:%s", channel->GetPeerIp(), channel->GetPeerPort());
         Connection* new_conn = CreateMessageConnection(channel);
         if (server_ != nullptr) {
             server_->AddAndSetConnection(new_conn);

@@ -104,7 +104,6 @@ void Channel::ParsePeerAddr()
     socklen_t addr_size = sizeof(&addr);
     getpeername(fd_, (struct sockaddr *)&addr, &addr_size);
     char* ptr = inet_ntoa(addr.sin_addr);
-    LOG_INFO("%s", ptr);
     while (*ptr != '\0') {
         peer_ip_.push_back(*ptr);
         ptr++;
