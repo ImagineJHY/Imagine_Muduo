@@ -116,7 +116,7 @@ void Connection::ProcessRead()
 void Connection::ProcessWrite()
 {
     write_callback_(this);
-    write_buffer_.Write(channel_->Getfd());
+    write_buffer_.Write(channel_->Getfd());LOG_INFO("hhhh");
     LOG_INFO("write data %sb", write_buffer_.GetLen());
     if (clear_write_buffer_) {
         write_buffer_.Clear();
