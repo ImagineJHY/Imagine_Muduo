@@ -93,6 +93,7 @@ Server* const Server::AddConnection(Connection* new_conn)
     std::pair<std::string, std::string> pair = std::make_pair(new_conn->GetPeerIp(), new_conn->GetPeerPort());
     std::unique_lock<std::mutex> lock(map_lock_);
     if (conn_map_.find(pair) == conn_map_.end()) {
+        LOG_INFO("Add Connection %p", new_conn);
         conn_map_.insert(std::make_pair(std::make_pair(new_conn->GetPeerIp(), new_conn->GetPeerPort()), new_conn));
     }
 
@@ -126,6 +127,7 @@ void Server::DestroyConnection()
         }
         LOG_INFO("Connection Use Count is 1");
         del_connection->Reset();
+        LOG_INFO("DELETE Connection %p", del_connection);
         delete del_connection;
     }
 }
