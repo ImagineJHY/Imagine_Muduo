@@ -256,9 +256,9 @@ std::shared_ptr<Channel> Channel::Create(EventLoop *loop, int value, ChannelTyep
 
 void Channel::Destroy(std::shared_ptr<Channel> channel)
 {
-    channel->self_.reset();
-    while (channel.use_count() > 2);
-    LOG_INFO("destroy channel success!");
+    // channel->self_.reset();
+    // while (channel.use_count() > 2);
+    // LOG_INFO("destroy channel success!");
     // printf("delete, usecount is %d\n",channel.use_count());
 }
 
@@ -270,6 +270,7 @@ void Channel::Update()
 void Channel::Close()
 {
     loop_->Close(self_);
+    self_.reset();
     // printf("关闭socket成功!\n");
 }
 
