@@ -108,7 +108,7 @@ void Channel::ParsePeerAddr()
         peer_ip_.push_back(*ptr);
         ptr++;
     }
-    peer_port_ = std::to_string(ntohs(addr.sin_port));
+    peer_port_ = std::to_string(addr.sin_port);
 }
 
 void Channel::ProcessIovec(struct iovec *io_block)
