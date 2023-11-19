@@ -185,6 +185,14 @@ class Buffer
                 write_idx_ = write_idx_ - (end_idx - begin_idx);
             }
         }
+
+        if (1000 < read_idx_ && static_cast<double>(write_idx_ - read_idx_) / buf_.size() < 0.5) {
+            for(size_t i = 0; i < write_idx_ - read_idx_; i++) {
+                buf_[i] = buf_[read_idx_ + i];
+            }
+            write_idx_ = write_idx_ - read_idx_;
+            read_idx_ = 0;
+        }
     }
 
  private:
