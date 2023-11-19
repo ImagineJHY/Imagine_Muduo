@@ -119,6 +119,7 @@ void Server::DestroyConnection()
 {
     pthread_mutex_lock(&destroy_lock_);
     while(!close_list_.empty()) {
+        LOG_INFO("list size is %d", close_list_.size());
         Connection* del_connection = close_list_.back();
         close_list_.pop_back();
         pthread_mutex_unlock(&destroy_lock_);
