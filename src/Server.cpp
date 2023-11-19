@@ -117,19 +117,19 @@ Connection* Server::GetMessageConnection() const
 
 void Server::DestroyConnection()
 {
-    while(close_list_.size()) {
-        pthread_mutex_lock(&destroy_lock_);
+    pthread_mutex_lock(&destroy_lock_);
+    while(close_list_.empty()) {
         Connection* del_connection = close_list_.back();
         close_list_.pop_back();
         pthread_mutex_unlock(&destroy_lock_);
-        while(del_connection->GetUseCount() > 1) {
-            LOG_INFO("close list size is %d, UseCount is %d", close_list_.size(), del_connection->GetUseCount());
-        }
+        while(del_connection->GetUseCount() > 1);
         LOG_INFO("Connection Use Count is 1");
         del_connection->Reset();
         LOG_INFO("DELETE Connection %p", del_connection);
         delete del_connection;
+        pthread_mutex_lock(&destroy_lock_);
     }
+    pthread_mutex_unlock(&destroy_lock_);
 }
 
 Server* const Server::CloseConnection(std::string ip, std::string port)
