@@ -121,7 +121,9 @@ void Server::DestroyConnection()
         Connection* del_connection = close_list_.back();
         close_list_.pop_back();
         pthread_mutex_unlock(&destroy_lock_);
-        while(del_connection->GetUseCount() > 1);
+        while(del_connection->GetUseCount() > 1) {
+            LOG_INFO("close list size is %d, UseCount is %d", close_list_.size(), del_connection->GetUseCount());
+        }
         LOG_INFO("Connection Use Count is 1");
         del_connection->Reset();
         delete del_connection;
