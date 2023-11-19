@@ -41,6 +41,10 @@ void Server::Init()
     if (!destroy_thread_) {
         throw std::exception();
     }
+
+    if (pthread_mutex_init(&destroy_lock_, nullptr) != 0) {
+        throw std::exception();
+    }
 }
 
 void Server::Start()
