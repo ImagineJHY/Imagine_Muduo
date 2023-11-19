@@ -90,10 +90,10 @@ Server* const Server::AddAndSetConnection(Connection* new_conn)
 
 Server* const Server::AddConnection(Connection* new_conn)
 {
-    std::pair<std::string, std::string> pair = std::make_pair(new_conn->GetIp(), new_conn->GetPort());
+    std::pair<std::string, std::string> pair = std::make_pair(new_conn->GetPeerIp(), new_conn->GetPeerPort());
     std::unique_lock<std::mutex> lock(map_lock_);
     if (conn_map_.find(pair) == conn_map_.end()) {
-        conn_map_.insert(std::make_pair(std::make_pair(new_conn->GetIp(), new_conn->GetPort()), new_conn));
+        conn_map_.insert(std::make_pair(std::make_pair(new_conn->GetPeerIp(), new_conn->GetPeerPort()), new_conn));
     }
 
     return this;

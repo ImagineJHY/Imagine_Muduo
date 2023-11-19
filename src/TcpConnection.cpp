@@ -1,5 +1,7 @@
 #include "Imagine_Muduo/TcpConnection.h"
 
+#include "Imagine_Muduo/Server.h"
+
 namespace Imagine_Muduo
 {
 
@@ -33,7 +35,8 @@ void TcpConnection::ReadHandler()
     LOG_INFO("Hello! This is TcpConnection!");
     if (!read_buffer_.Read(channel_->Getfd())) {
         LOG_INFO("close channel:%d", channel_->Getfd());
-        Close();
+        server_->CloseConnection(GetPeerIp(), GetPeerPort());
+        // Close();
         return;
     }
     ResetRecvTime();
