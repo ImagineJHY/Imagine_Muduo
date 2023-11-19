@@ -118,7 +118,7 @@ Connection* Server::GetMessageConnection() const
 void Server::DestroyConnection()
 {
     pthread_mutex_lock(&destroy_lock_);
-    while(close_list_.empty()) {
+    while(!close_list_.empty()) {
         Connection* del_connection = close_list_.back();
         close_list_.pop_back();
         pthread_mutex_unlock(&destroy_lock_);
