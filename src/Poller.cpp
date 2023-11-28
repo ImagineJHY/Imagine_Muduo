@@ -23,7 +23,7 @@ void EpollPoller::poll(int timeoutMs, std::vector<std::shared_ptr<Channel>> *act
 {
     epoll_event *events_set = new epoll_event[channel_num_];
     int events_num = epoll_wait(epollfd_, events_set, channel_num_, timeoutMs);
-    // printf("stop waiting...\n");
+    LOG_INFO("stop waiting...");
     if (events_num < 0 || errno == EINTR) {
         LOG_INFO("poll exception!");
         throw std::exception();
@@ -34,7 +34,7 @@ void EpollPoller::poll(int timeoutMs, std::vector<std::shared_ptr<Channel>> *act
         std::shared_ptr<Channel> temp_channel = channels_.find(events_set[i].data.fd)->second;
         pthread_mutex_unlock(&hashmap_lock_);
         if (!temp_channel) {
-            LOG_INFO("poll exception!");
+            LOG_INFO("poll exception!2");
             throw std::exception();
         }
         temp_channel->SetRevents(events_set[i].events);

@@ -14,22 +14,22 @@ void Channel::MakeSelf(std::shared_ptr<Channel> self)
     self_ = self;
 }
 
-void Channel::SetReadCallback(EventCallback callback)
+void Channel::SetReadCallback(ChannelCallback callback)
 {
     read_callback_ = std::move(callback);
 }
 
-void Channel::SetWriteCallback(EventCallback callback)
+void Channel::SetWriteCallback(ChannelCallback callback)
 {
     write_callback_ = std::move(callback);
 }
 
-void Channel::SetCloseCallback(EventCallback callback)
+void Channel::SetCloseCallback(ChannelCallback callback)
 {
     close_callback_ = std::move(callback);
 }
 
-void Channel::SetErrorCallback(EventCallback callback)
+void Channel::SetErrorCallback(ChannelCallback callback)
 {
     error_callback_ = std::move(callback);
 }
@@ -88,21 +88,27 @@ int Channel::GetEvents()
     return events_;
 }
 
-void Channel::InitIovec(struct iovec *read_str, struct sockaddr_in *addr, bool get_read_buf)
+std::string Channel::GetPeerIp() const
 {
-    read_str[0].iov_base = &fd_;
-    read_str[0].iov_len = 3;
-    socklen_t addr_size = sizeof(*addr);
-    getpeername(fd_, (struct sockaddr *)addr, &addr_size);
-    read_str[1].iov_base = addr;
-    read_str[1].iov_len = addr_size;
-    if (get_read_buf) {
-        read_str[2].iov_base = read_buffer_.GetData();
-        read_str[2].iov_len = read_buffer_.GetLen();
-    } else {
-        read_str[2].iov_base = write_buffer_.GetData();
-        read_str[2].iov_len = write_buffer_.GetLen();
+    return peer_ip_;
+}
+
+std::string Channel::GetPeerPort() const
+{
+    return peer_port_;
+}
+
+void Channel::ParsePeerAddr()
+{
+    struct sockaddr_in addr;
+    socklen_t addr_size = sizeof(&addr);
+    getpeername(fd_, (struct sockaddr *)&addr, &addr_size);
+    char* ptr = inet_ntoa(addr.sin_addr);
+    while (*ptr != '\0') {
+        peer_ip_.push_back(*ptr);
+        ptr++;
     }
+    peer_port_ = std::to_string(ntohs(addr.sin_port));
 }
 
 void Channel::ProcessIovec(struct iovec *io_block)
@@ -194,18 +200,16 @@ std::shared_ptr<Channel> Channel::Create(EventLoop *loop, int value, ChannelTyep
     new_channel->SetEventHandler(std::bind(&Channel::DefaultEventHandler, new_channel.get()));
 
     if (type == EventChannel) { // 创建通信Channel
-        new_channel->SetReadEventHandler(std::bind(&Channel::DefaultEventfdReadEventHandler, new_channel.get()));
-        new_channel->SetWriteEventHandler(std::bind(&Channel::DefaultEventfdWriteEventHandler, new_channel.get()));
+        // new_channel->SetReadEventHandler(std::bind(&Channel::DefaultEventfdReadEventHandler, new_channel.get()));
+        // new_channel->SetWriteEventHandler(std::bind(&Channel::DefaultEventfdWriteEventHandler, new_channel.get()));
         listenfd = value;
         socklen_t saddr_len = sizeof(saddr);
         sockfd = accept(listenfd, (struct sockaddr *)&saddr, &saddr_len);
         if (sockfd < 0) {
-            // printf("sockfd is %d",sockfd);
-            // printf("errno is %d\n",errno);
-            // printf("Create exception!\n");
             if (errno == EAGAIN) {
                 return nullptr;
             }
+            LOG_INFO("create channel exception");
             throw std::exception();
         }
         setsockopt(sockfd, SOL_SOCKET, SO_REUSEPORT, &reuse, sizeof(reuse)); // 设置端口复用
@@ -218,9 +222,10 @@ std::shared_ptr<Channel> Channel::Create(EventLoop *loop, int value, ChannelTyep
         events = EPOLLIN | EPOLLRDHUP | EPOLLONESHOT | EPOLLET;
         listenfd = 0;
     } else { // 创建监听Channel
-        new_channel->SetReadEventHandler(std::bind(&Channel::DefaultListenfdReadEventHandler, new_channel.get()));
+        // new_channel->SetReadEventHandler(std::bind(&Channel::DefaultListenfdReadEventHandler, new_channel.get()));
         listenfd = sockfd = socket(PF_INET, SOCK_STREAM, 0);
         if (sockfd == -1) {
+            LOG_INFO("create channel exception2");
             throw std::exception();
         }
 
@@ -251,8 +256,9 @@ std::shared_ptr<Channel> Channel::Create(EventLoop *loop, int value, ChannelTyep
 
 void Channel::Destroy(std::shared_ptr<Channel> channel)
 {
-    channel->self_.reset();
-    while (channel.use_count() > 2);
+    // channel->self_.reset();
+    // while (channel.use_count() > 2);
+    // LOG_INFO("destroy channel success!");
     // printf("delete, usecount is %d\n",channel.use_count());
 }
 
@@ -264,6 +270,7 @@ void Channel::Update()
 void Channel::Close()
 {
     loop_->Close(self_);
+    self_.reset();
     // printf("关闭socket成功!\n");
 }
 
@@ -307,12 +314,11 @@ bool Channel::Send(struct iovec *data, int len)
 
 Channel::~Channel() noexcept
 {
-    LOG_INFO("remove channel!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!%p", this);
+    LOG_INFO("Delete Channel");
 }
 
 void Channel::HandleEvent()
 {
-    // printf("this is HandleEvent!\n");
     this->handler_();
 }
 
@@ -334,7 +340,6 @@ void Channel::DefaultEventHandler()
     */
 
     // printf("\n\n\nim processing!fd():%d\n",fd);
-
     if ((revents_ & EPOLLIN) && read_handler_) {
         read_handler_();
     } else if ((revents_ & EPOLLOUT) && write_handler_) {
@@ -375,72 +380,72 @@ void Channel::DefaultListenfdReadEventHandler()
 
 void Channel::DefaultEventfdReadEventHandler()
 {
-    if (!read_buffer_.Read(fd_)) {
-        // 读取全部内容到reaad_buffer
-        // printf("对方已关闭连接!\n");
-        LOG_INFO("close channel:%p",this);
-        Close();
-        return;
-    }
+    // if (!read_buffer_.Read(fd_)) {
+    //     // 读取全部内容到reaad_buffer
+    //     // printf("对方已关闭连接!\n");
+    //     LOG_INFO("close channel:%p",this);
+    //     Close();
+    //     return;
+    // }
 
-    if (communicate_callback_) {
-        if (!communicate_callback_(read_buffer_.GetData(), read_buffer_.GetLen())) {
-            // 粘包
-            // printf("Tcp粘包!\n");
-            LOG_INFO("communicate channel:%p",this);
-            SetEvents(EPOLLIN | EPOLLONESHOT | EPOLLRDHUP);
+    // if (communicate_callback_) {
+    //     if (!communicate_callback_(read_buffer_.GetData(), read_buffer_.GetLen())) {
+    //         // 粘包
+    //         // printf("Tcp粘包!\n");
+    //         LOG_INFO("communicate channel:%p",this);
+    //         SetEvents(EPOLLIN | EPOLLONESHOT | EPOLLRDHUP);
 
-            return;
-        }
-    }
-    if (read_callback_) {
-        struct iovec read_str[3];
-        struct sockaddr_in addr;
-        InitIovec(read_str, &addr);
-        // int temp_fd=fd;
-        read_str[0].iov_base = &fd_;
-        read_iovec_ = read_callback_(read_str); // 将读取到的内容传给回调函数，并返回需要写的内容,read_iovec需要在Process中删除,read_iovec写的是需要返回的东西，因此指向的内容也需要在Process中删除
+    //         return;
+    //     }
+    // }
+    // if (read_callback_) {
+    //     struct iovec read_str[3];
+    //     struct sockaddr_in addr;
+    //     InitIovec(read_str, &addr);
+    //     // int temp_fd=fd;
+    //     read_str[0].iov_base = &fd_;
+    //     read_iovec_ = read_callback_(read_str); // 将读取到的内容传给回调函数，并返回需要写的内容,read_iovec需要在Process中删除,read_iovec写的是需要返回的东西，因此指向的内容也需要在Process中删除
 
-        if (read_iovec_) {
-            // 将数据读到write缓冲区
-            int len = read_iovec_[0].iov_len;
-            for (int i = 1; i < len; i++) {
-                // 将要写的内容添加到缓冲区
-                write_buffer_.append((char *)(read_iovec_[i].iov_base), read_iovec_[i].iov_len);
-            }
+    //     if (read_iovec_) {
+    //         // 将数据读到write缓冲区
+    //         int len = read_iovec_[0].iov_len;
+    //         for (int i = 1; i < len; i++) {
+    //             // 将要写的内容添加到缓冲区
+    //             write_buffer_.append((char *)(read_iovec_[i].iov_base), read_iovec_[i].iov_len);
+    //         }
 
-            ProcessIovec(read_iovec_);
-            if (!alive_) {
-                write_buffer_.Write(fd_);
-                Close();
+    //         ProcessIovec(read_iovec_);
+    //         if (!alive_) {
+    //             write_buffer_.Write(fd_);
+    //             Close();
 
-                return;
-            }
-            if (!clear_readbuf_) {                         
-                // 发生粘包
-                write_buffer_.Clear(); // 清空写缓冲区
-                SetEvents(EPOLLIN | EPOLLONESHOT | EPOLLRDHUP);
-                return;
-            }
+    //             return;
+    //         }
+    //         if (!clear_readbuf_) {                         
+    //             // 发生粘包
+    //             write_buffer_.Clear(); // 清空写缓冲区
+    //             SetEvents(EPOLLIN | EPOLLONESHOT | EPOLLRDHUP);
+    //             return;
+    //         }
 
-            // 不再需要通信,直接返回
-            if ((!read_or_write_) || (!alive_)) {
-                write_buffer_.Write(fd_);
-                Close();
+    //         // 不再需要通信,直接返回
+    //         if ((!read_or_write_) || (!alive_)) {
+    //             write_buffer_.Write(fd_);
+    //             Close();
 
-                return;
-            }
+    //             return;
+    //         }
 
-            read_buffer_.Clear();
+    //         read_buffer_.Clear();
 
-            SetEvents(read_or_write_ | EPOLLONESHOT | EPOLLRDHUP);
-        }
-    }
+    //         SetEvents(read_or_write_ | EPOLLONESHOT | EPOLLRDHUP);
+    //     }
+    // }
 }
 
 void Channel::DefaultTimerfdReadEventHandler()
 {
-    Imagine_Tool::TimeStamp now(Imagine_Tool::TimeUtil::GetNow());
+    Imagine_Tool::TimeStamp now(NOW_MS);
     Imagine_Tool::TimeUtil::ReadTimerfd(this->Getfd());
     // printf("after reading timer!\n");
     std::vector<Imagine_Tool::Timer *> expired_timers = this->GetLoop()->GetExpiredTimers(now);
@@ -464,65 +469,75 @@ void Channel::DefaultTimerfdReadEventHandler()
 
 void Channel::DefaultEventfdWriteEventHandler()
 {
-    LOG_INFO("write channel:%p",this);
-    if (write_callback_) {
-        // iov_base第一个字节用于标识该段char*由谁删除,1表示需要在这里删除
-        struct iovec *write_iovec;
-        if (write_callback_flag_ && write_iovec_) {
-            int len = write_iovec_[0].iov_len;
-            write_iovec = new struct iovec[len];
-            for (int i = 0; i < len; i++) {
-                write_iovec[i].iov_base = write_iovec_[i].iov_base;
-                write_iovec[i].iov_len = write_iovec_[i].iov_len;
-            }
-        }
-        if (!write_callback_flag_) {
-            struct iovec read_str[3];
-            struct sockaddr_in addr;
-            InitIovec(read_str, &addr, false);
-            write_iovec_ = write_callback_(read_str); // 将写缓冲区的内容传给写回调函数，并返回需要写的内容,write_iovec_需要在Process中删除,write_iovec写的是一些常态化数据,如文件内容,write_buffer缓冲区内容等，不需要在Process中删除
-            write_callback_flag_ = true;
-            int len = write_iovec_[0].iov_len;
-            write_iovec = new struct iovec[len];
-            for (int i = 0; i < len; i++) {
-                write_iovec[i].iov_base = write_iovec_[i].iov_base;
-                write_iovec[i].iov_len = write_iovec_[i].iov_len;
-            }
-        }
-        if (!Send(write_iovec + 1, write_iovec[0].iov_len - 1)) {
-            // 错误关闭
-            LOG_INFO("write error channel:%p",this);
-            delete[] write_iovec;
-            if (write_iovec_) {
-                ProcessIovec(write_iovec_);
-            }
-            // printf("sure close!\n");
-            Close();
+    // LOG_INFO("write channel:%p",this);
+    // if (write_callback_) {
+    //     // iov_base第一个字节用于标识该段char*由谁删除,1表示需要在这里删除
+    //     struct iovec *write_iovec;
+    //     if (write_callback_flag_ && write_iovec_) {
+    //         int len = write_iovec_[0].iov_len;
+    //         write_iovec = new struct iovec[len];
+    //         for (int i = 0; i < len; i++) {
+    //             write_iovec[i].iov_base = write_iovec_[i].iov_base;
+    //             write_iovec[i].iov_len = write_iovec_[i].iov_len;
+    //         }
+    //     }
+    //     if (!write_callback_flag_) {
+    //         struct iovec read_str[3];
+    //         struct sockaddr_in addr;
+    //         InitIovec(read_str, &addr, false);
+    //         write_iovec_ = write_callback_(read_str); // 将写缓冲区的内容传给写回调函数，并返回需要写的内容,write_iovec_需要在Process中删除,write_iovec写的是一些常态化数据,如文件内容,write_buffer缓冲区内容等，不需要在Process中删除
+    //         write_callback_flag_ = true;
+    //         int len = write_iovec_[0].iov_len;
+    //         write_iovec = new struct iovec[len];
+    //         for (int i = 0; i < len; i++) {
+    //             write_iovec[i].iov_base = write_iovec_[i].iov_base;
+    //             write_iovec[i].iov_len = write_iovec_[i].iov_len;
+    //         }
+    //     }
+    //     if (!Send(write_iovec + 1, write_iovec[0].iov_len - 1)) {
+    //         // 错误关闭
+    //         LOG_INFO("write error channel:%p",this);
+    //         delete[] write_iovec;
+    //         if (write_iovec_) {
+    //             ProcessIovec(write_iovec_);
+    //         }
+    //         // printf("sure close!\n");
+    //         Close();
 
-            return;
-        }
+    //         return;
+    //     }
 
-        delete[] write_iovec;
+    //     delete[] write_iovec;
 
-        if (write_flag_) {
-            write_buffer_.Clear();
+    //     if (write_flag_) {
+    //         write_buffer_.Clear();
 
-            if (write_iovec_) {
-                ProcessIovec(write_iovec_);
-                if ((!read_or_write_) || (!alive_)) {
-                    Close();
-                    return;
-                }
-                SetEvents(read_or_write_ | EPOLLONESHOT | EPOLLRDHUP);
-            }
-            write_flag_ = false;
-            write_callback_flag_ = false;
-            write_iovec_ = nullptr;
-        }
-    } else {
-        Close();
-        return;
-    }
+    //         if (write_iovec_) {
+    //             ProcessIovec(write_iovec_);
+    //             if ((!read_or_write_) || (!alive_)) {
+    //                 Close();
+    //                 return;
+    //             }
+    //             SetEvents(read_or_write_ | EPOLLONESHOT | EPOLLRDHUP);
+    //         }
+    //         write_flag_ = false;
+    //         write_callback_flag_ = false;
+    //         write_iovec_ = nullptr;
+    //     }
+    // } else {
+    //     Close();
+    //     return;
+    // }
+}
+
+void Channel::SetReadHandler(EventHandler read_handler)
+{
+    read_handler_ = read_handler;
+}
+
+void Channel::SetWriteHandler(EventHandler write_handler)
+{
+    write_handler_ = write_handler;
 }
 
 bool Channel::SetEventHandler(EventHandler handler)

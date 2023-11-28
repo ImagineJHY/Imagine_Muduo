@@ -128,7 +128,6 @@ void *ThreadPool<T>::Worker(void *data)
             task->HandleEvent();
         }
         // task->Process();
-        // printf("任务完成,use_count为:%d\n",task.use_count());
     }
 
     return nullptr;
