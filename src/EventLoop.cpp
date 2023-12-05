@@ -271,7 +271,9 @@ bool EventLoop::InsertTimer(Imagine_Tool::Timer *timer)
         Imagine_Tool::TimeUtil::ResetTimerfd(timer_channel_->Getfd(), timers_.top()->GetCallTime());
     }
     pthread_mutex_lock(&timer_map_lock_);
-    timer_map_.insert(std::make_pair(timer->GetTimerId(), timer));
+    if (timer_map_.find(timer->GetTimerId()) == timer_map_.end()) {
+        timer_map_.insert(std::make_pair(timer->GetTimerId(), timer));
+    }
     pthread_mutex_unlock(&timer_map_lock_);
     pthread_mutex_unlock(&timer_lock_);
 
