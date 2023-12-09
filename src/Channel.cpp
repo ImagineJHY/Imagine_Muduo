@@ -236,7 +236,7 @@ std::shared_ptr<Channel> Channel::Create(EventLoop *loop, int value, ChannelTyep
         saddr.sin_addr.s_addr = INADDR_ANY;
         bind(sockfd, (struct sockaddr *)&saddr, sizeof(saddr)); // 绑定端口
 
-        if (listen(sockfd, 100) == -1) {
+        if (listen(sockfd, 5) == -1) {
             LOG_INFO("Create listen exception!");
             throw std::exception();
         }
