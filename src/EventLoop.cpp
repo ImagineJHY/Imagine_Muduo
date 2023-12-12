@@ -1,5 +1,6 @@
 #include "Imagine_Muduo/EventLoop.h"
 
+#include "Imagine_Muduo/common_macro.h"
 #include "Imagine_Muduo/Channel.h"
 #include "Imagine_Muduo/EpollPoller.h"
 #include "Imagine_Muduo/ThreadPool.h"

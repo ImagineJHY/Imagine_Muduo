@@ -1,5 +1,7 @@
 #include "Imagine_Muduo/Buffer.h"
 
+#include "Imagine_Muduo/common_macro.h"
+
 namespace Imagine_Muduo
 {
 
@@ -23,7 +25,7 @@ bool Buffer::Read(int fd)
         if (bytes_num == -1) {
             delete[] temp_buf;
             if (errno == EAGAIN || errno == EWOULDBLOCK) {
-                // LOG_INFO("数据读取完毕!\n");
+                // IMAGINE_MUDUO_LOG("数据读取完毕!\n");
                 break;
             }
 
@@ -32,7 +34,7 @@ bool Buffer::Read(int fd)
             // 对方关闭连接
             delete[] temp_buf;
 
-            // LOG_INFO("对方关闭连接!");
+            // IMAGINE_MUDUO_LOG("对方关闭连接!");
             return false;
         }
 
@@ -46,7 +48,7 @@ bool Buffer::Read(int fd)
 
 int Buffer::Write(int fd)
 {
-    LOG_INFO("this is write func!");
+    IMAGINE_MUDUO_LOG("this is write func!");
     write(fd, &(buf_[read_idx_]), write_idx_ - read_idx_);
 
     return 0;
@@ -150,8 +152,8 @@ void Buffer::Clear()
 void Buffer::Clear(size_t begin_idx, size_t end_idx)
 {
     if (begin_idx >= GetLen() || end_idx > GetLen()) {
-        LOG_INFO("clear buffer exception read idx is %zu, write idx is %zu, capacity is %zu, total size is %d", read_idx_, write_idx_, buf_.capacity(), total_size_);
-        LOG_INFO("clear buffer exception begin idx is %zu, end_idx is %zu", begin_idx, end_idx);
+        IMAGINE_MUDUO_LOG("clear buffer exception read idx is %zu, write idx is %zu, capacity is %zu, total size is %d", read_idx_, write_idx_, buf_.capacity(), total_size_);
+        IMAGINE_MUDUO_LOG("clear buffer exception begin idx is %zu, end_idx is %zu", begin_idx, end_idx);
         throw std::exception();
     }
     if (begin_idx == 0) {

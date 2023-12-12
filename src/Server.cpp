@@ -1,5 +1,6 @@
 #include "Imagine_Muduo/Server.h"
 
+#include "Imagine_Muduo/common_macro.h"
 #include "Imagine_Muduo/EventLoop.h"
 
 namespace Imagine_Muduo
@@ -64,13 +65,13 @@ void Server::Start()
             return nullptr;
         }, this) != 0) {
         delete[] destroy_thread_;
-        LOG_INFO("loop exception!");
+        IMAGINE_MUDUO_LOG("loop exception!");
         throw std::exception();
     }
 
     if (pthread_detach(*destroy_thread_)) {
         delete[] destroy_thread_;
-        LOG_INFO("destroy exception");
+        IMAGINE_MUDUO_LOG("destroy exception");
         throw std::exception();
     }
     loop_->loop();
@@ -102,7 +103,7 @@ Server* const Server::AddConnection(Connection* new_conn)
     std::pair<std::string, std::string> pair = std::make_pair(new_conn->GetPeerIp(), new_conn->GetPeerPort());
     std::unique_lock<std::mutex> lock(map_lock_);
     if (conn_map_.find(pair) == conn_map_.end()) {
-        LOG_INFO("Add Connection %p", new_conn);
+        IMAGINE_MUDUO_LOG("Add Connection %p", new_conn);
         conn_map_.insert(std::make_pair(std::make_pair(new_conn->GetPeerIp(), new_conn->GetPeerPort()), new_conn));
     }
 
@@ -128,14 +129,14 @@ void Server::DestroyConnection()
 {
     pthread_mutex_lock(&destroy_lock_);
     while(!close_list_.empty()) {
-        LOG_INFO("list size is %d", close_list_.size());
+        IMAGINE_MUDUO_LOG("list size is %d", close_list_.size());
         Connection* del_connection = close_list_.back();
         close_list_.pop_back();
         pthread_mutex_unlock(&destroy_lock_);
         while(del_connection->GetUseCount() > 1);
-        LOG_INFO("Connection Use Count is 1");
+        IMAGINE_MUDUO_LOG("Connection Use Count is 1");
         del_connection->Reset();
-        LOG_INFO("DELETE Connection %p", del_connection);
+        IMAGINE_MUDUO_LOG("DELETE Connection %p", del_connection);
         delete del_connection;
         pthread_mutex_lock(&destroy_lock_);
     }

@@ -1,5 +1,6 @@
 #include "Imagine_Muduo/Acceptor.h"
 
+#include "Imagine_Muduo/common_macro.h"
 #include "Imagine_Muduo/Server.h"
 #include "Imagine_Muduo/Channel.h"
 #include "Imagine_Muduo/EventLoop.h"
@@ -18,7 +19,7 @@ Acceptor::Acceptor(Connection* msg_conn) : Connection(), msg_conn_(msg_conn)
 
 Acceptor::Acceptor(Server* server, std::shared_ptr<Channel> channel) : Connection(server, channel)
 {
-    // LOG_INFO("setting!");
+    // IMAGINE_MUDUO_LOG("setting!");
     // channel_->SetReadCallback(std::bind(&Acceptor::ReadHandler, this));
     // channel_->SetWriteCallback(std::bind(&Acceptor::WriteHandler, this));
 }
@@ -38,9 +39,10 @@ Connection* Acceptor::Create(const std::shared_ptr<Channel>& channel) const
 
 void Acceptor::ReadHandler()
 {
-    LOG_INFO("this is Acceptor's ReadHandler!");
+    #include "Imagine_Muduo/common_definition.h"
+    IMAGINE_MUDUO_LOG("this is Acceptor's ReadHandler!");
     if (loop_->GetChannelnum() >= loop_->GetMaxchannelnum()) {
-        LOG_INFO("channel num over quantity! channel num is %d, max_channel_num is %d", loop_->GetChannelnum(), loop_->GetMaxchannelnum());
+        IMAGINE_MUDUO_LOG("channel num over quantity! channel num is %d, max_channel_num is %d", loop_->GetChannelnum(), loop_->GetMaxchannelnum());
         return;
     } else {
         std::shared_ptr<Channel> channel = Channel::Create(loop_, channel_->Getfd());

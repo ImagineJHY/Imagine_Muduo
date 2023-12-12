@@ -56,7 +56,7 @@ ThreadPool<T>::ThreadPool(int thread_num, int max_request) : thread_num_(thread_
     }
 
     for (int i = 0; i < thread_num; i++) {
-        LOG_INFO("create pthread %d ...", i);
+        IMAGINE_MUDUO_LOG("create pthread %d ...", i);
         if (pthread_create(threads_ + i, nullptr, Worker, this) != 0) {
             delete[] threads_;
             throw std::exception();

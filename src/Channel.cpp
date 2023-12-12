@@ -1,5 +1,6 @@
 #include "Imagine_Muduo/Channel.h"
 
+#include "Imagine_Muduo/common_macro.h"
 #include "Imagine_Muduo/EventLoop.h"
 #include "Imagine_Muduo/Buffer.h"
 
@@ -172,7 +173,7 @@ std::shared_ptr<Channel> Channel::Create(EventLoop *loop, int value, ChannelTyep
             if (errno == EAGAIN) {
                 return nullptr;
             }
-            LOG_INFO("create channel exception");
+            IMAGINE_MUDUO_LOG("create channel exception");
             throw std::exception();
         }
         setsockopt(sockfd, SOL_SOCKET, SO_REUSEPORT, &reuse, sizeof(reuse)); // 设置端口复用
@@ -187,7 +188,7 @@ std::shared_ptr<Channel> Channel::Create(EventLoop *loop, int value, ChannelTyep
     } else { // 创建监听Channel
         listenfd = sockfd = socket(PF_INET, SOCK_STREAM, 0);
         if (sockfd == -1) {
-            LOG_INFO("create channel exception2");
+            IMAGINE_MUDUO_LOG("create channel exception2");
             throw std::exception();
         }
 
@@ -199,7 +200,7 @@ std::shared_ptr<Channel> Channel::Create(EventLoop *loop, int value, ChannelTyep
         bind(sockfd, (struct sockaddr *)&saddr, sizeof(saddr)); // 绑定端口
 
         if (listen(sockfd, 128) == -1) {
-            LOG_INFO("Create listen exception!");
+            IMAGINE_MUDUO_LOG("Create listen exception!");
             throw std::exception();
         }
         events = EPOLLIN | EPOLLRDHUP | EPOLLONESHOT;

@@ -1,5 +1,6 @@
 #include "Imagine_Muduo/Connection.h"
 
+#include "Imagine_Muduo/common_macro.h"
 #include "Imagine_Muduo/Server.h"
 #include "Imagine_Muduo/Buffer.h"
 #include "Imagine_Muduo/Channel.h"
@@ -114,7 +115,7 @@ void Connection::ProcessRead()
         read_callback_(this);
         if (clear_read_buffer_) {
             read_buffer_->Clear(msg_begin_idx_, msg_end_idx_);
-            LOG_INFO("Clear read buffer from %d to %d, buffer size is %d", msg_begin_idx_, msg_end_idx_, read_buffer_->GetLen());
+            IMAGINE_MUDUO_LOG("Clear read buffer from %d to %d, buffer size is %d", msg_begin_idx_, msg_end_idx_, read_buffer_->GetLen());
         }
     } while (get_next_msg_);
     UpdateRevent();
