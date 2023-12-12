@@ -1,5 +1,7 @@
 #include "Imagine_Muduo/Server.h"
 
+#include "Imagine_Muduo/EventLoop.h"
+
 namespace Imagine_Muduo
 {
 
@@ -7,19 +9,22 @@ Server::Server()
 {
 }
 
-Server::Server(std::string profile_name, Connection* msg_conn, Connection* acceptor) : loop_(new EventLoop(profile_name)), acceptor_(acceptor), msg_conn_(msg_conn)
+Server::Server(const std::string& profile_name, Connection* msg_conn, Connection* acceptor) : loop_(new EventLoop(profile_name)), acceptor_(acceptor), msg_conn_(msg_conn)
 {
     Init();
 }
 
-Server::Server(YAML::Node config, Connection* msg_conn, Connection* acceptor) : loop_(new EventLoop(config)), acceptor_(acceptor), msg_conn_(msg_conn)
+Server::Server(const YAML::Node& config, Connection* msg_conn, Connection* acceptor) : loop_(new EventLoop(config)), acceptor_(acceptor), msg_conn_(msg_conn)
 {
     Init();
 }
     
 Server::~Server()
 {
+    delete loop_;
     delete acceptor_;
+    delete msg_conn_;
+    delete destroy_thread_;
 }
 
 void Server::Init()
@@ -71,7 +76,7 @@ void Server::Start()
     loop_->loop();
 }
 
-long long Server::SetTimer(Imagine_Tool::TimerCallback timer_callback, double interval, double delay)
+long long Server::SetTimer(TimerCallback timer_callback, double interval, double delay)
 {
     return loop_->SetTimer(timer_callback, interval, delay);
 }
@@ -137,7 +142,7 @@ void Server::DestroyConnection()
     pthread_mutex_unlock(&destroy_lock_);
 }
 
-Server* const Server::CloseConnection(std::string ip, std::string port)
+Server* const Server::CloseConnection(const std::string& ip, const std::string& port)
 {
     Connection* del_conn = RemoveConnection(ip, port);
     if (del_conn != nullptr) {
@@ -150,7 +155,7 @@ Server* const Server::CloseConnection(std::string ip, std::string port)
     return this;
 }
 
-Connection* const Server::RemoveConnection(std::string ip, std::string port)
+Connection* const Server::RemoveConnection(const std::string& ip, const std::string& port)
 {
     std::unique_lock<std::mutex> lock(map_lock_);
     auto it = conn_map_.find(std::make_pair(ip, port));

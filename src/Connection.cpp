@@ -1,5 +1,8 @@
 #include "Imagine_Muduo/Connection.h"
+
 #include "Imagine_Muduo/Server.h"
+#include "Imagine_Muduo/Buffer.h"
+#include "Imagine_Muduo/Channel.h"
 
 namespace Imagine_Muduo
 {
@@ -21,15 +24,19 @@ Connection::Connection(Server* server, std::shared_ptr<Channel> channel) : chann
 
 Connection::~Connection()
 {
+    delete read_buffer_;
+    delete write_buffer_;
 }
 
-Connection* const Connection::Init()
+Connection* Connection::Init()
 {
     msg_format_ = MessageFormat::None;
     msg_status_ = MessageStatus::None;
     keep_alive_ = true;
     next_event_ = Event::Read;
     get_next_msg_ = false;
+    read_buffer_ = new Buffer();
+    write_buffer_ = new Buffer();
     clear_read_buffer_ = true;
     clear_write_buffer_ = true;
     if (channel_.get() != nullptr) {
@@ -45,7 +52,7 @@ Connection* const Connection::Init()
 
 void Connection::PackageCoalescingDetector()
 {
-    size_t read_size = read_buffer_.GetLen();
+    size_t read_size = read_buffer_->GetLen();
     msg_begin_idx_ = 0;
     msg_end_idx_ = read_size;
     if (msg_format_ == MessageFormat::None) {
@@ -64,7 +71,7 @@ void Connection::PackageCoalescingDetector()
                     msg_status_ = MessageStatus::OverComplete;
                     msg_end_idx_ = msg_length_;
                     for(size_t idx = msg_end_idx_ - 1; idx >= msg_begin_idx_; idx--) {
-                        if (*(read_buffer_.Peek(idx)) != place_holder_) {
+                        if (*(read_buffer_->Peek(idx)) != place_holder_) {
                             msg_end_idx_ = idx + 1;
                             break;
                         }
@@ -77,7 +84,7 @@ void Connection::PackageCoalescingDetector()
             }
         case MessageFormat::SpecialEOF:
             {
-                msg_end_idx_ = read_buffer_.FindFirst(eof_) + eof_.size();
+                msg_end_idx_ = read_buffer_->FindFirst(eof_) + eof_.size();
                 if (msg_end_idx_ > read_size) {
                     msg_status_ = MessageStatus::InComplete;
                 } else if (msg_end_idx_ < read_size) {
@@ -90,12 +97,12 @@ void Connection::PackageCoalescingDetector()
     }
 }
 
-void Connection::DefaultReadCallback(Connection* conn)
+void Connection::DefaultReadCallback(Connection* conn) const
 {
     return;
 }
 
-void Connection::DefaultWriteCallback(Connection* conn)
+void Connection::DefaultWriteCallback(Connection* conn) const
 {
     return;
 }
@@ -106,8 +113,8 @@ void Connection::ProcessRead()
         PackageCoalescingDetector();
         read_callback_(this);
         if (clear_read_buffer_) {
-            read_buffer_.Clear(msg_begin_idx_, msg_end_idx_);
-            LOG_INFO("Clear read buffer from %d to %d, buffer size is %d", msg_begin_idx_, msg_end_idx_, read_buffer_.GetLen());
+            read_buffer_->Clear(msg_begin_idx_, msg_end_idx_);
+            LOG_INFO("Clear read buffer from %d to %d, buffer size is %d", msg_begin_idx_, msg_end_idx_, read_buffer_->GetLen());
         }
     } while (get_next_msg_);
     UpdateRevent();
@@ -116,9 +123,9 @@ void Connection::ProcessRead()
 void Connection::ProcessWrite()
 {
     write_callback_(this);
-    write_buffer_.Write(channel_->Getfd());
+    write_buffer_->Write(channel_->Getfd());
     if (clear_write_buffer_) {
-        write_buffer_.Clear();
+        write_buffer_->Clear();
     }
     UpdateRevent();
 }
@@ -191,7 +198,7 @@ Server* Connection::GetServer() const
     return server_;
 }
 
-Connection* const Connection::SetServer(Server* const server)
+Connection* Connection::SetServer(Server* server)
 {
     server_ = server;
 }
@@ -203,52 +210,52 @@ size_t Connection::GetMessageLen() const
 
 const char* Connection::GetData() const
 {
-    return read_buffer_.GetData();
+    return read_buffer_->GetData();
 }
 
 size_t Connection::GetLen() const
 {
-    return read_buffer_.GetLen();
+    return read_buffer_->GetLen();
 }
 
-Connection* const Connection::AppendData(const char* data, size_t len)
+Connection* Connection::AppendData(const char* data, size_t len)
 {
-    write_buffer_.append(data, len);
+    write_buffer_->append(data, len);
 
     return this;
 }
 
-Connection* const Connection::ClearReadBuffer()
+Connection* Connection::ClearReadBuffer()
 {
-    read_buffer_.Clear();
+    read_buffer_->Clear();
 
     return this;
 }
 
-Connection* const Connection::ClearWriteBuffer()
+Connection* Connection::ClearWriteBuffer()
 {
-    write_buffer_.Clear();
+    write_buffer_->Clear();
 
     return this;
 }
 
-Connection* const Connection::SetAlive(bool keep_alive)
+Connection* Connection::SetAlive(bool keep_alive)
 {
     keep_alive_ = keep_alive;
     
     return this;
 }
 
-Connection* const Connection::SetRevent(Connection::Event revent)
+Connection* Connection::SetRevent(Connection::Event revent)
 {
     next_event_ = revent;
 
     return this;
 }
 
-Connection* const Connection::SetMessageEndIdx(size_t msg_end_idx)
+Connection* Connection::SetMessageEndIdx(size_t msg_end_idx)
 {
-    if (msg_end_idx < msg_begin_idx_ || read_buffer_.GetLen() < msg_end_idx) {
+    if (msg_end_idx < msg_begin_idx_ || read_buffer_->GetLen() < msg_end_idx) {
         throw std::exception();
     }
     msg_end_idx_ = msg_end_idx;
@@ -256,68 +263,68 @@ Connection* const Connection::SetMessageEndIdx(size_t msg_end_idx)
     return this;
 }
 
-Connection* const Connection::IsTakeNextMessage(bool get_next_msg)
+Connection* Connection::IsTakeNextMessage(bool get_next_msg)
 {
     get_next_msg_ = get_next_msg;
 
     return this;
 }
 
-Connection* const Connection::IsClearReadBuffer(bool is_clear)
+Connection* Connection::IsClearReadBuffer(bool is_clear)
 {
     clear_read_buffer_ = is_clear;
 
     return this;
 }
 
-Connection* const Connection::IsClearWriteBuffer(bool is_clear)
+Connection* Connection::IsClearWriteBuffer(bool is_clear)
 {
     clear_write_buffer_ = is_clear;
 
     return this;
 }
 
-Connection* const Connection::SetReadCallback(ConnectionCallback read_callback)
+Connection* Connection::SetReadCallback(ConnectionCallback read_callback)
 {
     read_callback_ = read_callback;
 
     return this;
 }
 
-Connection* const Connection::SetWriteCallback(ConnectionCallback write_callback)
+Connection* Connection::SetWriteCallback(ConnectionCallback write_callback)
 {
     write_callback_ = write_callback;
 
     return this;
 }
 
-Connection* const Connection::Close()
+Connection* Connection::Close()
 {
     channel_->Close();
 
     return nullptr;
 }
 
-size_t const Connection::GetUseCount() const
+size_t Connection::GetUseCount() const
 {
     return channel_.use_count();
 }
 
-Connection* const Connection::Reset()
+Connection* Connection::Reset()
 {
     channel_.reset();
 
     return this;
 }
 
-Connection* const Connection::ResetRecvTime()
+Connection* Connection::ResetRecvTime()
 {
     recv_time.SetTime(NOW_MS);
 
     return this;
 }
 
-Connection* const Connection::UpdateRevent()
+Connection* Connection::UpdateRevent()
 {
     if (!keep_alive_) {
         server_->CloseConnection(ip_, port_);

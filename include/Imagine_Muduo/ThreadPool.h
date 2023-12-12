@@ -1,7 +1,7 @@
 #ifndef IMAGINE_MUDUO_THREADPOOL_H
 #define IMAGINE_MUDUO_THREADPOOL_H
 
-#include "Imagine_Log/Logger.h"
+#include "Imagine_Log/Imagine_Log.h"
 
 #include <pthread.h>
 #include <list>
@@ -127,7 +127,6 @@ void *ThreadPool<T>::Worker(void *data)
         if (task) {
             task->HandleEvent();
         }
-        // task->Process();
     }
 
     return nullptr;

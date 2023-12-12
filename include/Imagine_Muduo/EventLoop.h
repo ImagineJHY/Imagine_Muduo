@@ -1,13 +1,8 @@
 #ifndef IMAGINE_MUDUO_EVENTLOOP_H
 #define IMAGINE_MUDUO_EVENTLOOP_H
 
-#include "Imagine_Time/Timer.h"
-#include "Imagine_Log/Logger.h"
-#include "Imagine_Log/SingletonLogger.h"
-#include "Imagine_Log/NonSingletonLogger.h"
-#include "Imagine_Muduo/ThreadPool.h"
-#include "Imagine_Muduo/Poller.h"
-#include "Imagine_Muduo/common_definition.h"
+#include "common_definition.h"
+#include "common_typename.h"
 
 #include <pthread.h>
 #include <vector>
@@ -21,73 +16,52 @@
 namespace Imagine_Muduo
 {
 
+template <typename T>
+class ThreadPool;
 class Channel;
-
 class Poller;
-class EpollPoller;
 
 class EventLoop
 {
  public:
-   // 配置文件形式初始化
    EventLoop();
 
-   EventLoop(std::string  profile_name);
+   EventLoop(const std::string&  profile_name);
 
-   EventLoop(YAML::Node config);
-
-   EventLoop(int port, int thread_num = 10, int max_channel = 10000, ChannelCallback read_cb = nullptr, ChannelCallback write_cb = nullptr, EventCommunicateCallback communicate_cb = nullptr);
+   EventLoop(const YAML::Node& config);
 
    ~EventLoop();
 
-   void Init(std::string profile_path);
+   void Init(const std::string& profile_path);
 
-   void Init(YAML::Node config);
-
-   void InitProfilePath(std::string profile_name);
-   
-   void GenerateSubmoduleProfile(YAML::Node config);
+   void Init(const YAML::Node& config);
 
    void InitLoop();
 
    void loop();
 
-   int GetChannelnum();
+   int GetChannelnum() const;
 
-   bool AddListenChannel(std::string port);
+   EventLoop* AddListenChannel(const std::string& port);
 
-   bool AddListenChannel(int port);
+   EventLoop* AddListenChannel(int port);
 
-   bool AddEventChannel(std::string port);
+   EventLoop* AddEventChannel(const std::string& port);
 
-   bool AddEventChannel(int port);
-
-   void AddChannelnum();
+   EventLoop* AddEventChannel(int port);
 
    std::shared_ptr<Channel> GetListenChannel() const;
 
-   int GetMaxchannelnum();
+   int GetMaxchannelnum() const;
 
-   Poller *GetEpoll();
+   EventLoop* AddChannel(std::shared_ptr<Channel> channel);
 
-   ChannelCallback GetReadCallback();
+   const EventLoop* UpdateChannel(std::shared_ptr<Channel> channel) const;
 
-   ChannelCallback GetWriteCallback();
-
-   EventCommunicateCallback GetCommunicateCallback();
-
-   void SetReadCallback(ChannelCallback read_callback_);
-
-   void SetWriteCallback(ChannelCallback write_callback_);
-
-   void SetCommunicateCallback(EventCommunicateCallback communicate_callback);
-
-   void UpdateChannel(std::shared_ptr<Channel> channel);
-
-   void Close(std::shared_ptr<Channel> channel);
+   EventLoop* CloseChannel(std::shared_ptr<Channel> channel);
 
    // 心跳检测根据fd删除channel用
-   void Closefd(int fd);
+   EventLoop* Closefd(int fd);
 
    /*
    -所有的时间参数都是以秒为单位，并且是从loop开始的相对时间
@@ -95,50 +69,33 @@ class EventLoop
    -interval_表示每次执行的间隔时间,为0表示只执行一次
    -delay_与interval_不能同时为0
    */
-   long long SetTimer(Imagine_Tool::TimerCallback timer_callback, double interval, double delay = 0.0);
+   long long SetTimer(TimerCallback timer_callback, double interval, double delay = 0.0);
 
-   bool CloseTimer(long long timer_id);
+   EventLoop* CloseTimer(long long timer_id);
 
-   bool InsertTimer(Imagine_Tool::Timer *timer);
+   EventLoop* InsertTimer(Timer *timer);
 
-   std::vector<Imagine_Tool::Timer *> GetExpiredTimers(const Imagine_Tool::TimeStamp &now);
-
-   // std::shared_ptr<Channel> GetTimer(){return timer_channel;}
+   std::vector<Timer *> GetExpiredTimers(const TimeStamp &now);
 
  private:
-  size_t thread_num_;
-  size_t max_channel_num_;
-  size_t port_;
-  std::string log_name_;
-  std::string log_path_;
-  size_t max_log_file_size_;
-  bool async_log_;
-  bool singleton_log_mode_;
-  std::string log_title_;
-  bool log_with_timestamp_;
-  Imagine_Tool::Logger* logger_;
-
-  std::string profile_path_;
-  std::string log_profile_name_;
+  // 配置文件字段
+  size_t thread_num_;                                                             // 线程池线程数目
+  size_t max_channel_num_;                                                        // 允许的最大连接数
+  size_t port_;                                                                   // 监听端口
+  bool singleton_log_mode_;                                                       // 单例日志(目前仅支持单例日志)
+  Logger* logger_;                                                                // 日志对象
 
  private:
-   bool quit_;
-   ThreadPool<std::shared_ptr<Channel>> *pool_;
-   int channel_num_;           // 当前连接的客户端数目
-   ChannelCallback read_callback_;
-   ChannelCallback write_callback_;
-   EventCommunicateCallback communicate_callback_ = nullptr;
-   Poller *epoll_;
-   // vector<Channel*> channels_;
-   std::shared_ptr<Channel> listen_channel_;
-
-   pthread_mutex_t timer_lock_;
-   std::shared_ptr<Channel> timer_channel_;
-   std::priority_queue<Imagine_Tool::Timer *, std::vector<Imagine_Tool::Timer *>, Imagine_Tool::TimeUtil::TimerPtrCmp> timers_;
-
-   pthread_mutex_t timer_map_lock_;
-   std::unordered_map<long long, Imagine_Tool::Timer *> timer_map_;
-   // const int timerfd_;
+   bool quit_;                                                                    // loop退出标识
+   ThreadPool<std::shared_ptr<Channel>> *thread_pool_;                                   // 线程池对象
+   int channel_num_;                                                              // 当前连接的客户端数目
+   Poller *epoll_;                                                                // I/O多路复用(epoll)对象
+   std::shared_ptr<Channel> listen_channel_;                                      // 负责监听端口的channel
+   pthread_mutex_t timer_lock_;                                                   // 定时器队列的锁
+   std::shared_ptr<Channel> timer_channel_;                                       // 负责定时器计时的channel
+   std::priority_queue<Timer *, std::vector<Timer *>, TimerPtrCmp> timers_;       // 定时器队列
+   pthread_mutex_t timer_map_lock_;                                               // 定时器hash_map的锁
+   std::unordered_map<long long, Timer *> timer_map_;                             // 定时器hash_map
 };
 
 } // namespace Imagine_Muduo

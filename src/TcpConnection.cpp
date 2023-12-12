@@ -1,6 +1,8 @@
 #include "Imagine_Muduo/TcpConnection.h"
 
 #include "Imagine_Muduo/Server.h"
+#include "Imagine_Muduo/Buffer.h"
+#include "Imagine_Muduo/Channel.h"
 
 namespace Imagine_Muduo
 {
@@ -25,7 +27,7 @@ TcpConnection::~TcpConnection()
 {
 }
 
-Connection* TcpConnection::Create(std::shared_ptr<Channel> channel)
+Connection* TcpConnection::Create(const std::shared_ptr<Channel>& channel) const
 {
     return new TcpConnection(server_, channel);
 }
@@ -33,7 +35,7 @@ Connection* TcpConnection::Create(std::shared_ptr<Channel> channel)
 void TcpConnection::ReadHandler()
 {
     LOG_INFO("Hello! This is TcpConnection!");
-    if (!read_buffer_.Read(channel_->Getfd())) {
+    if (!read_buffer_->Read(channel_->Getfd())) {
         LOG_INFO("close channel:%d", channel_->Getfd());
         server_->CloseConnection(GetPeerIp(), GetPeerPort());
         // Close();
@@ -48,13 +50,13 @@ void TcpConnection::WriteHandler()
     ProcessWrite();
 }
 
-void TcpConnection::DefaultReadCallback(Connection* conn)
+void TcpConnection::DefaultReadCallback(Connection* conn) const
 {
     LOG_INFO("this is TcpConnection DefaultReadCallback!");
     return;
 }
 
-void TcpConnection::DefaultWriteCallback(Connection* conn)
+void TcpConnection::DefaultWriteCallback(Connection* conn) const
 {
     return;
 }

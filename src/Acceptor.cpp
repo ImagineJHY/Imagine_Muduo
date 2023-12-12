@@ -1,5 +1,9 @@
 #include "Imagine_Muduo/Acceptor.h"
+
 #include "Imagine_Muduo/Server.h"
+#include "Imagine_Muduo/Channel.h"
+#include "Imagine_Muduo/EventLoop.h"
+#include "Imagine_Muduo/Poller.h"
 
 namespace Imagine_Muduo
 {
@@ -9,10 +13,6 @@ Acceptor::Acceptor() : Connection()
 }
 
 Acceptor::Acceptor(Connection* msg_conn) : Connection(), msg_conn_(msg_conn)
-{
-}
-
-Acceptor::Acceptor(Server* server, Connection* msg_conn) : Connection(), msg_conn_(msg_conn)
 {
 }
 
@@ -31,7 +31,7 @@ Acceptor::~Acceptor()
 {
 }
 
-Connection* Acceptor::Create(std::shared_ptr<Channel> channel)
+Connection* Acceptor::Create(const std::shared_ptr<Channel>& channel) const
 {
     return new Acceptor(server_, channel, server_->GetMessageConnection());
 }
@@ -52,8 +52,7 @@ void Acceptor::ReadHandler()
         if (server_ != nullptr) {
             server_->AddAndSetConnection(new_conn);
         }
-        loop_->GetEpoll()->AddChannel(channel);
-        loop_->AddChannelnum();
+        loop_->AddChannel(channel);
     }
     channel_->SetEvents(EPOLLIN | EPOLLONESHOT | EPOLLRDHUP);
     // printf("this is listenfd!\n");
@@ -64,35 +63,18 @@ void Acceptor::WriteHandler()
     return;
 }
 
-void Acceptor::DefaultReadCallback(Connection* conn)
+void Acceptor::DefaultReadCallback(Connection* conn) const
 {
-    std::shared_ptr<Channel> channel = Channel::Create(loop_, channel_->Getfd());
-    if (channel == nullptr) {
-        return;
-    }
-    loop_->GetEpoll()->AddChannel(channel);
-    loop_->AddChannelnum();
-    Connection* new_conn = this->CreateMessageConnection(channel);
-    if (server_ != nullptr) {
-        server_->AddAndSetConnection(new_conn);
-    }
 }
 
-void Acceptor::DefaultWriteCallback(Connection* conn)
+void Acceptor::DefaultWriteCallback(Connection* conn) const
 {
     return;
 }
 
-Connection* Acceptor::CreateMessageConnection(std::shared_ptr<Channel> channel)
+Connection* Acceptor::CreateMessageConnection(const std::shared_ptr<Channel>& channel) const
 {
     return msg_conn_->Create(channel);
-}
-
-Acceptor* const Acceptor::SetMessageConnection(Connection* msg_conn)
-{
-    msg_conn_ = msg_conn;
-
-    return this;
 }
 
 } // namespace Imagine_Muduo

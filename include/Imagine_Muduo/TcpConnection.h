@@ -17,18 +17,15 @@ class TcpConnection : public Connection
 
     ~TcpConnection();
 
-    Connection* Create(std::shared_ptr<Channel> channel);
+    Connection* Create(const std::shared_ptr<Channel>& channel) const;
 
     void ReadHandler();
 
     void WriteHandler();
 
-    void DefaultReadCallback(Connection* conn);
+    void DefaultReadCallback(Connection* conn) const;
 
-    void DefaultWriteCallback(Connection* conn);
-
- private:
-    
+    void DefaultWriteCallback(Connection* conn) const;
 };
 
 } // namespace Imagine_Muduo
