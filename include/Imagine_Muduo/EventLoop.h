@@ -87,7 +87,7 @@ class EventLoop
 
  private:
    bool quit_;                                                                    // loop退出标识
-   ThreadPool<std::shared_ptr<Channel>> *thread_pool_;                                   // 线程池对象
+   ThreadPool<std::shared_ptr<Channel>> *thread_pool_;                            // 线程池对象
    int channel_num_;                                                              // 当前连接的客户端数目
    Poller *epoll_;                                                                // I/O多路复用(epoll)对象
    std::shared_ptr<Channel> listen_channel_;                                      // 负责监听端口的channel
