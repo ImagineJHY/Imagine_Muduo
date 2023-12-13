@@ -1,8 +1,6 @@
 #ifndef IMAGINE_MUDUO_BUFFER_H
 #define IMAGINE_MUDUO_BUFFER_H
 
-#include "Imagine_Log/Imagine_Log.h"
-
 #include <sys/types.h>
 #include <string>
 #include <vector>

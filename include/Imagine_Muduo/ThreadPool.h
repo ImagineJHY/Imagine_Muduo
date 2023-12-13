@@ -1,7 +1,7 @@
 #ifndef IMAGINE_MUDUO_THREADPOOL_H
 #define IMAGINE_MUDUO_THREADPOOL_H
 
-#include "Imagine_Log/Imagine_Log.h"
+#include "log_macro.h"
 
 #include <pthread.h>
 #include <list>
