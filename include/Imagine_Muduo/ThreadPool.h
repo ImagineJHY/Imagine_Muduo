@@ -84,8 +84,6 @@ void ThreadPool<T>::PutTask(T task)
     if (tasks_.size() < static_cast<size_t>(max_request_)) {
         pthread_mutex_lock(&lock_);
         tasks_.push_back(task);
-        // printf("I put a task!\n");
-        // printf("block_num is %d\n,task num is %d\n",block_num,tasks.size());
         pthread_mutex_unlock(&lock_);
         sem_post(&sem_);
     } else {
@@ -97,11 +95,8 @@ template <typename T>
 T ThreadPool<T>::GetTask()
 {
     while (!quit_) {
-        // block_num++;
         sem_wait(&sem_);
         pthread_mutex_lock(&lock_);
-        // block_num--;
-        // printf("block_num is %d\n,task num is %d\n",block_num,tasks.size());
         if (tasks_.empty()) {
             pthread_mutex_unlock(&lock_);
             continue;
@@ -122,8 +117,6 @@ void *ThreadPool<T>::Worker(void *data)
     ThreadPool<T> *threadpool = (ThreadPool<T> *)data;
     while (!threadpool->quit_) {
         T task = threadpool->GetTask();
-        // printf("I Get a Task!\n");
-        // printf("任务开始,use_count为:%d\n",task.use_count());
         if (task) {
             task->HandleEvent();
         }
