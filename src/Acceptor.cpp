@@ -39,8 +39,6 @@ Connection* Acceptor::Create(const std::shared_ptr<Channel>& channel) const
 
 void Acceptor::ReadHandler()
 {
-    #include "Imagine_Muduo/common_definition.h"
-    IMAGINE_MUDUO_LOG("this is Acceptor's ReadHandler!");
     if (loop_->GetChannelnum() >= loop_->GetMaxchannelnum()) {
         IMAGINE_MUDUO_LOG("channel num over quantity! channel num is %d, max_channel_num is %d", loop_->GetChannelnum(), loop_->GetMaxchannelnum());
         return;
@@ -50,14 +48,13 @@ void Acceptor::ReadHandler()
             return;
         }
         channel->ParsePeerAddr();
-        Connection* new_conn = CreateMessageConnection(channel);
+        Connection* new_conn = this->CreateMessageConnection(channel);
         if (server_ != nullptr) {
             server_->AddAndSetConnection(new_conn);
         }
         loop_->AddChannel(channel);
     }
     channel_->SetEvents(EPOLLIN | EPOLLONESHOT | EPOLLRDHUP);
-    // printf("this is listenfd!\n");
 }
 
 void Acceptor::WriteHandler()
