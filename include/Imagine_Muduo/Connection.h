@@ -1,9 +1,7 @@
 #ifndef IMAGINE_MUDUO_CONNECTION_H
 #define IMAGINE_MUDUO_CONNECTION_H
 
-#include "Buffer.h"
-#include "Channel.h"
-#include "EventLoop.h"
+#include "common_typename.h"
 
 #include <memory>
 #include <string>
@@ -12,24 +10,30 @@ namespace Imagine_Muduo
 {
 
 class Server;
+class Buffer;
+class Channel;
+class EventLoop;
 
 class Connection
 {
  public:
-   enum class MessageFormat{
+   enum class MessageFormat
+   {
       None = 0,
       FixedLenth,
       SpecialEOF
    };
 
-   enum class MessageStatus{
+   enum class MessageStatus
+   {
       None = 0,
       Complete,
       InComplete,
       OverComplete
    };
 
-   enum class Event{
+   enum class Event
+   {
       Read = 0,
       Write,
       ReadAndWrite
@@ -44,22 +48,23 @@ class Connection
 
    virtual ~Connection();
 
-   Connection* const Init();
+   Connection* Init();
 
-   virtual Connection* Create(std::shared_ptr<Channel> channel) = 0;
+   virtual Connection* Create(const std::shared_ptr<Channel>& channel) const = 0;
 
-   // Channel的读回调函数
+   // Connection对于读事件的处理函数, 注册给Channel, 一般使用Acceptor及TcpConnection的默认实现即可
    virtual void ReadHandler() = 0;
 
-   // Channel的写回调函数
+   // Connection对于写事件的处理函数, 注册给Channel
    virtual void WriteHandler() = 0;
 
    // 粘包判断函数
    void PackageCoalescingDetector();
 
-   virtual void DefaultReadCallback(Connection* conn);
+   // Connection对于请求的处理函数(TcpConnection的ReaadHandler会调用ProcessRead, 进而调用该函数, 对读取的消息进行处理, 这里可以写具体的业务逻辑)
+   virtual void DefaultReadCallback(Connection* conn) const;
 
-   virtual void DefaultWriteCallback(Connection* conn);
+   virtual void DefaultWriteCallback(Connection* conn) const;
 
    void ProcessRead();
 
@@ -89,7 +94,7 @@ class Connection
 
    Server* GetServer() const;
 
-   Connection* const SetServer(Server* const server);
+   Connection* SetServer(Server* server);
 
    size_t GetMessageLen() const;
 
@@ -97,45 +102,45 @@ class Connection
 
    size_t GetLen() const;
 
-   Connection* const AppendData(const char* data, size_t len);
+   Connection* AppendData(const char* data, size_t len);
 
-   Connection* const ClearReadBuffer();
+   Connection* ClearReadBuffer();
 
-   Connection* const ClearWriteBuffer();
+   Connection* ClearWriteBuffer();
 
-   Connection* const SetAlive(bool keep_alive);
+   Connection* SetAlive(bool keep_alive);
 
-   Connection* const SetRevent(Event revent);
+   Connection* SetRevent(Event revent);
 
-   Connection* const SetMessageEndIdx(size_t msg_end_idx);
+   Connection* SetMessageEndIdx(size_t msg_end_idx);
 
-   Connection* const IsTakeNextMessage(bool get_next_msg);
+   Connection* IsTakeNextMessage(bool get_next_msg);
 
-   Connection* const IsClearReadBuffer(bool is_clear);
+   Connection* IsClearReadBuffer(bool is_clear);
 
-   Connection* const IsClearWriteBuffer(bool is_clear);
+   Connection* IsClearWriteBuffer(bool is_clear);
 
-   Connection* const SetReadCallback(ConnectionCallback read_callback);
+   Connection* SetReadCallback(ConnectionCallback read_callback);
 
-   Connection* const SetWriteCallback(ConnectionCallback write_callback);
+   Connection* SetWriteCallback(ConnectionCallback write_callback);
 
-   Connection* const Close();
+   Connection* Close();
 
-   size_t const GetUseCount() const;
+   size_t GetUseCount() const;
 
-   Connection* const Reset();
+   Connection* Reset();
 
  protected:
-   Connection* const ResetRecvTime();
+   Connection* ResetRecvTime();
 
-   Connection* const UpdateRevent();
+   Connection* UpdateRevent();
 
  protected:
    EventLoop* loop_;
    std::shared_ptr<Channel> channel_;
    Server* server_;
-   Buffer read_buffer_;
-   Buffer write_buffer_;
+   Buffer* read_buffer_;
+   Buffer* write_buffer_;
    ConnectionCallback read_callback_;
    ConnectionCallback write_callback_;
 
@@ -147,7 +152,7 @@ class Connection
    char place_holder_;
    std::string eof_;
 
-   Imagine_Tool::TimeStamp recv_time;
+   TimeStamp recv_time;
    MessageStatus msg_status_;
    size_t msg_begin_idx_;
    size_t msg_end_idx_;

@@ -11,13 +11,13 @@ class TcpServer : public Server
  public:
     TcpServer();
 
-    TcpServer(std::string profile_name);
+    TcpServer(const std::string& profile_name);
 
-    TcpServer(YAML::Node config);
+    TcpServer(const YAML::Node& config);
 
-    TcpServer(std::string profile_name, Connection* msg_conn);
+    TcpServer(const std::string& profile_name, Connection* msg_conn);
 
-    TcpServer(YAML::Node config, Connection* msg_conn);
+    TcpServer(const YAML::Node& config, Connection* msg_conn);
 
     ~TcpServer();
 

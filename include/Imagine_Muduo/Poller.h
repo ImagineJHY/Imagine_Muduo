@@ -1,9 +1,6 @@
 #ifndef IMAGINE_MUDUO_POLLER_H
 #define IMAGINE_MUDUO_POLLER_H
 
-#include <sys/epoll.h>
-#include <unordered_map>
-#include <errno.h>
 #include <vector>
 #include <memory>
 
@@ -11,40 +8,23 @@ namespace Imagine_Muduo
 {
 
 class Channel;
-class EventLoop;
 
 class Poller
 {
  public:
-    virtual void poll(int timeoutMs, std::vector<std::shared_ptr<Channel>> *active_channels) = 0;
-    virtual ~Poller(){};
-    virtual void AddChannel(std::shared_ptr<Channel> channel) = 0;
-    virtual void DelChannel(std::shared_ptr<Channel> channel) = 0;
-    virtual void Update(int fd, int events) = 0;
-    virtual std::shared_ptr<Channel> FindChannel(int fd) = 0;
-};
+    Poller();
+    
+    virtual ~Poller();
 
-class EpollPoller : public Poller
-{
- public:
-    EpollPoller(EventLoop *loop);
+    virtual Poller* poll(int timeoutMs, std::vector<std::shared_ptr<Channel>>& active_channels) = 0;
 
-    void poll(int timeoutMs, std::vector<std::shared_ptr<Channel>> *active_channels);
+    virtual Poller* AddChannel(const std::shared_ptr<Channel>& channel) = 0;
 
-    void AddChannel(std::shared_ptr<Channel> channel);
+    virtual Poller* DelChannel(const std::shared_ptr<Channel>& channel) = 0;
 
-    void DelChannel(std::shared_ptr<Channel> channel);
+    virtual const Poller* Update(int fd, int events) const = 0;
 
-    void Update(int fd, int events);
-
-    std::shared_ptr<Channel> FindChannel(int fd);
-
- private:
-    int epollfd_;
-    int channel_num_;
-    pthread_mutex_t hashmap_lock_;
-    std::unordered_map<int, std::shared_ptr<Channel>> channels_;
-    EventLoop *loop_;
+    virtual std::shared_ptr<Channel> FindChannel(int fd) const = 0;
 };
 
 } // namespace Imagine_Muduo

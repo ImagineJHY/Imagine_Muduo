@@ -1,7 +1,8 @@
 #include "Imagine_Muduo/EventLoop.h"
 
+#include "Imagine_Muduo/log_macro.h"
 #include "Imagine_Muduo/Channel.h"
-#include "Imagine_Muduo/Poller.h"
+#include "Imagine_Muduo/EpollPoller.h"
 #include "Imagine_Muduo/ThreadPool.h"
 
 #include <memory>
@@ -10,37 +11,28 @@
 namespace Imagine_Muduo
 {
 
-// long long Imagine_Tool::Timer::id_ = 0;
-
 EventLoop::EventLoop()
             : quit_(0), channel_num_(0), epoll_(new EpollPoller(this)), timer_channel_(Channel::Create(this, 0, Channel::ChannelTyep::TimerChannel))
 {
-
 }
 
-EventLoop::EventLoop(std::string profile_name) : EventLoop()
+EventLoop::EventLoop(const std::string& profile_name) : EventLoop()
 {
     Init(profile_name);
 }
 
-EventLoop::EventLoop(YAML::Node config) : EventLoop()
+EventLoop::EventLoop(const YAML::Node& config) : EventLoop()
 {
     Init(config);
 }
 
-EventLoop::EventLoop(int port, int thread_num, int max_channel, ChannelCallback read_cb, ChannelCallback write_cb, EventCommunicateCallback communicate_cb)
-                 : thread_num_(thread_num), quit_(0), channel_num_(0), max_channel_num_(max_channel), read_callback_(read_cb), write_callback_(write_cb), communicate_callback_(communicate_cb), epoll_(new EpollPoller(this)), timer_channel_(Channel::Create(this, 0, Channel::ChannelTyep::TimerChannel))
-{
-    InitLoop();
-}
-
 EventLoop::~EventLoop()
 {
-    delete pool_;
+    delete thread_pool_;
     delete epoll_;
 }
 
-void EventLoop::Init(std::string profile_name)
+void EventLoop::Init(const std::string& profile_name)
 {
     if (profile_name == "") {
         throw std::exception();
@@ -49,24 +41,18 @@ void EventLoop::Init(std::string profile_name)
     Init(config);
 }
 
-void EventLoop::Init(YAML::Node config)
+void EventLoop::Init(const YAML::Node& config)
 {
     port_ = config["port"].as<size_t>();
     thread_num_ = config["thread_num"].as<size_t>();
     max_channel_num_ = config["max_channel_num"].as<size_t>();
-    log_name_ = config["log_name"].as<std::string>();
-    log_path_ = config["log_path"].as<std::string>();
-    max_log_file_size_ = config["max_log_file_size"].as<size_t>();
-    async_log_ = config["async_log"].as<bool>();
     singleton_log_mode_ = config["singleton_log_mode"].as<bool>();
-    log_title_ = config["log_title"].as<std::string>();
-    log_with_timestamp_ = config["log_with_timestamp"].as<bool>();
 
     if (singleton_log_mode_) {
-        logger_ = Imagine_Tool::SingletonLogger::GetInstance();
+        logger_ = SingletonLogger::GetInstance();
     } else {
-        logger_ = new Imagine_Tool::NonSingletonLogger();
-        Imagine_Tool::Logger::SetInstance(logger_);
+        logger_ = new NonSingletonLogger();
+        Logger::SetInstance(logger_);
     }
 
     logger_->Init(config);
@@ -74,30 +60,12 @@ void EventLoop::Init(YAML::Node config)
     InitLoop();
 }
 
-void EventLoop::InitProfilePath(std::string profile_name)
-{
-    size_t idx = profile_name.find_last_of("/");
-    profile_path_ = profile_name.substr(0, idx + 1);
-    log_profile_name_ = profile_path_ + "generate_Log_profile.yaml";
-}
-
-void EventLoop::GenerateSubmoduleProfile(YAML::Node config)
-{
-    std::ofstream fout(log_profile_name_.c_str());
-    config.remove(config["port"]);
-    config.remove(config["thread_num"]);
-    config.remove(config["max_channel_num"]);
-    config.remove(config["singleton_log_mode"]);
-    fout << config;
-    fout.close();
-}
-
 void EventLoop::InitLoop()
 {
     listen_channel_ = Channel::Create(this, port_, Channel::ChannelTyep::ListenChannel);
 
     try {
-        pool_ = new ThreadPool<std::shared_ptr<Channel>>(thread_num_, max_channel_num_); // 初始化线程池
+        thread_pool_ = new ThreadPool<std::shared_ptr<Channel>>(thread_num_, max_channel_num_); // 初始化线程池
     } catch (...) {
         throw std::exception();
     }
@@ -118,50 +86,45 @@ void EventLoop::loop()
 {
     while (!quit_) {
         std::vector<std::shared_ptr<Channel>> active_channels;
-        epoll_->poll(-1, &active_channels);
+        epoll_->poll(-1, active_channels);
         while (active_channels.size()) {
-            pool_->PutTask(active_channels[active_channels.size() - 1]);
+            thread_pool_->PutTask(active_channels[active_channels.size() - 1]);
             active_channels.pop_back();
         }
     }
 }
 
-int EventLoop::GetChannelnum()
+int EventLoop::GetChannelnum() const
 {
     return channel_num_;
 }
 
-bool EventLoop::AddListenChannel(std::string port)
+EventLoop* EventLoop::AddListenChannel(const std::string& port)
 {
     Channel::Create(this, atoi(&port[0]), Channel::ChannelTyep::ListenChannel);
 
-    return true;
+    return this;
 }
 
-bool EventLoop::AddListenChannel(int port)
+EventLoop* EventLoop::AddListenChannel(int port)
 {
     Channel::Create(this, port, Channel::ChannelTyep::ListenChannel);
 
-    return true;
+    return this;
 }
 
-bool EventLoop::AddEventChannel(std::string port)
+EventLoop* EventLoop::AddEventChannel(const std::string& port)
 {
     Channel::Create(this, atoi(&port[0]), Channel::ChannelTyep::EventChannel);
 
-    return true;
+    return this;
 }
 
-bool EventLoop::AddEventChannel(int port)
+EventLoop* EventLoop::AddEventChannel(int port)
 {
     Channel::Create(this, port, Channel::ChannelTyep::EventChannel);
 
-    return true;
-}
-
-void EventLoop::AddChannelnum()
-{
-    channel_num_++;
+    return this;
 }
 
 std::shared_ptr<Channel> EventLoop::GetListenChannel() const
@@ -169,120 +132,97 @@ std::shared_ptr<Channel> EventLoop::GetListenChannel() const
     return listen_channel_;
 }
 
-int EventLoop::GetMaxchannelnum()
+int EventLoop::GetMaxchannelnum() const
 {
     return max_channel_num_;
 }
 
-Poller *EventLoop::GetEpoll()
-{
-    return epoll_;
-}
+ EventLoop* EventLoop::AddChannel(std::shared_ptr<Channel> channel)
+ {
+    epoll_->AddChannel(channel);
+    channel_num_++;
 
-ChannelCallback EventLoop::GetReadCallback()
-{
-    return read_callback_;
-}
+    return this;
+ }
 
-ChannelCallback EventLoop::GetWriteCallback()
-{
-    return write_callback_;
-}
-
-EventCommunicateCallback EventLoop::GetCommunicateCallback()
-{
-    return communicate_callback_;
-}
-
-void EventLoop::SetReadCallback(ChannelCallback read_callback)
-{
-    read_callback_ = read_callback;
-}
-
-void EventLoop::SetWriteCallback(ChannelCallback write_callback)
-{
-    write_callback_ = write_callback;
-}
-
-void EventLoop::SetCommunicateCallback(EventCommunicateCallback communicate_callback)
-{
-    communicate_callback_ = communicate_callback;
-}
-
-void EventLoop::UpdateChannel(std::shared_ptr<Channel> channel)
+const EventLoop* EventLoop::UpdateChannel(std::shared_ptr<Channel> channel) const
 {
     epoll_->Update(channel->Getfd(), channel->GetEvents());
+
+    return this;
 }
 
-void EventLoop::Close(std::shared_ptr<Channel> channel)
+EventLoop* EventLoop::CloseChannel(std::shared_ptr<Channel> channel)
 {
     if (channel.get() == nullptr) {
-        return;
+        return this;
     }
     channel_num_--;
     epoll_->DelChannel(channel);
+
+    return this;
 }
 
-void EventLoop::Closefd(int fd)
+EventLoop* EventLoop::Closefd(int fd)
 {
-    Close(epoll_->FindChannel(fd));
+    CloseChannel(epoll_->FindChannel(fd));
+
+    return this;
 }
 
-long long EventLoop::SetTimer(Imagine_Tool::TimerCallback timer_callback, double interval, double delay)
+long long EventLoop::SetTimer(TimerCallback timer_callback, double interval, double delay)
 {
     if (interval == 0 && delay == 0) {
         return false;
     }
-    Imagine_Tool::TimeStamp new_time;
+    TimeStamp new_time;
     if (delay) {
-        new_time.SetTime(Imagine_Tool::TimeUtil::MicroSecondsAddSeconds(Imagine_Tool::TimeUtil::GetNow(), delay));
+        new_time.SetTime(TimeUtil::MicroSecondsAddSeconds(TimeUtil::GetNow(), delay));
     } else {
-        new_time.SetTime(Imagine_Tool::TimeUtil::MicroSecondsAddSeconds(Imagine_Tool::TimeUtil::GetNow(), interval));
+        new_time.SetTime(TimeUtil::MicroSecondsAddSeconds(TimeUtil::GetNow(), interval));
     }
-    Imagine_Tool::Timer *new_timer = new Imagine_Tool::Timer(new_time, timer_callback, interval);
-    // printf("now is %lld\nnew is %lld\n",TimeUtil::GetNow(),new_timer->GetCallTime().GetTime());
+    Timer *new_timer = new Timer(new_time, timer_callback, interval);
     InsertTimer(new_timer);
 
     return new_timer->GetTimerId();
 }
 
-bool EventLoop::CloseTimer(long long timer_id)
+EventLoop* EventLoop::CloseTimer(long long timer_id)
 {
     pthread_mutex_lock(&timer_map_lock_);
-    // printf("timerid is %lld\n",timer_id);
-    std::unordered_map<long long, Imagine_Tool::Timer *>::iterator it = timer_map_.find(timer_id);
+    std::unordered_map<long long, Timer *>::iterator it = timer_map_.find(timer_id);
     if (it == timer_map_.end()) {
-        LOG_INFO("closeTimer exception");
-        throw std::exception();
+        pthread_mutex_unlock(&timer_map_lock_);
+        return this;
     }
     it->second->Close();
     timer_map_.erase(it);
-    pthread_mutex_unlock(&timer_map_lock_);
 
-    return true;
+    return this;
 }
 
-bool EventLoop::InsertTimer(Imagine_Tool::Timer *timer)
+EventLoop* EventLoop::InsertTimer(Timer *timer)
 {
     pthread_mutex_lock(&timer_lock_);
     timers_.push(timer);
     if (timers_.top() == timer) {
-        // printf("now is %lld\nnew is %lld\n",TimeUtil::GetNow(),timers_.top()->GetCallTime().GetTime());
-        Imagine_Tool::TimeUtil::ResetTimerfd(timer_channel_->Getfd(), timers_.top()->GetCallTime());
+        TimeUtil::ResetTimerfd(timer_channel_->Getfd(), timers_.top()->GetCallTime());
     }
     pthread_mutex_lock(&timer_map_lock_);
-    timer_map_.insert(std::make_pair(timer->GetTimerId(), timer));
+    if (timer_map_.find(timer->GetTimerId()) == timer_map_.end()) {
+        timer_map_.insert(std::make_pair(timer->GetTimerId(), timer));
+    }
     pthread_mutex_unlock(&timer_map_lock_);
     pthread_mutex_unlock(&timer_lock_);
 
-    return true;
+    return this;
 }
 
-std::vector<Imagine_Tool::Timer *> EventLoop::GetExpiredTimers(const Imagine_Tool::TimeStamp &now)
+std::vector<Timer *> EventLoop::GetExpiredTimers(const TimeStamp &now)
 {
-    std::vector<Imagine_Tool::Timer *> expired_timers;
+    std::vector<Timer *> expired_timers;
     pthread_mutex_lock(&timer_lock_);
-    Imagine_Tool::Timer *top_timer = timers_.top();
+    Timer *top_timer = timers_.top();
     // 比较绝对时间
     while (timers_.size() && (top_timer->GetCallTime().GetTime()) < (now.GetTime())) {
         expired_timers.push_back(top_timer);
@@ -290,9 +230,9 @@ std::vector<Imagine_Tool::Timer *> EventLoop::GetExpiredTimers(const Imagine_Too
         top_timer = timers_.top();
     }
     if (timers_.size()) {
-        Imagine_Tool::TimeUtil::ResetTimerfd(timer_channel_->Getfd(), timers_.top()->GetCallTime());
+        TimeUtil::ResetTimerfd(timer_channel_->Getfd(), timers_.top()->GetCallTime());
     } else {
-        Imagine_Tool::TimeUtil::SetDefaultTimerfd(timer_channel_->Getfd());
+        TimeUtil::SetDefaultTimerfd(timer_channel_->Getfd());
     }
     pthread_mutex_unlock(&timer_lock_);
 

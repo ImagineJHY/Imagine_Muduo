@@ -1,17 +1,15 @@
 #ifndef IMAGINE_MUDUO_CHANNEL_H
 #define IMAGINE_MUDUO_CHANNEL_H
 
-#include "Imagine_Muduo/EventLoop.h"
-#include "Imagine_Muduo/Buffer.h"
+#include "common_typename.h"
 
 #include <string>
-#include <functional>
 #include <sys/epoll.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <sys/types.h>
 #include <fcntl.h>
-#include <algorithm>
+#include <memory>
 
 namespace Imagine_Muduo
 {
@@ -22,81 +20,55 @@ class Buffer;
 class Channel
 {
  public:
-   enum ChannelTyep{
+   enum ChannelTyep
+   {
       ListenChannel,
       EventChannel,
       TimerChannel
    };
 
  public:
-    // Channel();
+    Channel();
 
     ~Channel();
 
-    void MakeSelf(std::shared_ptr<Channel> self);
+    Channel* MakeSelf(std::shared_ptr<Channel> self);
 
-    void SetReadCallback(ChannelCallback callback);
+    Channel* EnableRead();
 
-    void SetWriteCallback(ChannelCallback callback);
+    Channel* EnableWrite();
 
-    void SetCloseCallback(ChannelCallback callback);
+    Channel* DisableRead();
 
-    void SetErrorCallback(ChannelCallback callback);
+    Channel* DisableWrite();
 
-    void SetCommunicateCallback(EventCommunicateCallback callback);
+    Channel* SetRevents(int revents);
 
-    void EnableRead();
+    Channel* SetEvents(int events);
 
-    void EnableWrite();
+    int GetRevents() const;
 
-    void DisableRead();
-
-    void DisableWrite();
-
-    int SetRevents(int revents);
-
-    int SetEvents(int events);
-
-    int GetRevents();
-
-    int GetEvents();
+    int GetEvents() const;
 
     std::string GetPeerIp() const;
 
     std::string GetPeerPort() const;
 
-    // void HandleEvent();
+    Channel* ParsePeerAddr();
 
-    bool Process();
+    Channel* Setfd(int fd);
 
-    void ParsePeerAddr();
+    int Getfd() const;
 
-    void ProcessIovec(struct iovec *io_block);
+    Channel* SetLoop(EventLoop *loop);
 
-    void Setfd(int fd);
+    EventLoop *GetLoop() const;
 
-    int Getfd();
-
-    void SetAddr(struct sockaddr_in &addr);
-
-    struct sockaddr_in GetAddr();
-
-    void SetLoop(EventLoop *loop);
-
-    EventLoop *GetLoop();
-
-    void SetListenfd(int fd)
-    {
-        listen_fd_ = fd;
-    }
+    Channel* SetListenfd(int fd);
 
     static void SetNonBlocking(int fd);
 
     static std::shared_ptr<Channel> Create(EventLoop *loop, int value, ChannelTyep type = EventChannel);
-
-    static void Destroy(std::shared_ptr<Channel> channel);
-
-    bool Send(struct iovec *send_data, int len);
 
     void Close();
 
@@ -104,55 +76,33 @@ class Channel
 
     void DefaultEventHandler();
 
-    void DefaultListenfdReadEventHandler();
-
-    void DefaultEventfdReadEventHandler();
-
     void DefaultTimerfdReadEventHandler();
 
-    void DefaultEventfdWriteEventHandler();
+    Channel* SetReadHandler(EventHandler read_handler);
 
-    void SetReadHandler(EventHandler read_handler);
+    Channel* SetWriteHandler(EventHandler write_handler);
 
-    void SetWriteHandler(EventHandler write_handler);
-
-    bool SetEventHandler(EventHandler handler);
-
-    bool SetReadEventHandler(EventHandler read_handler);
-
-    bool SetWriteEventHandler(EventHandler write_handler);
+    Channel* SetEventHandler(EventHandler handler);
 
  private:
-    void Update();
+    void Init();
+
+    void Update() const;
 
  private:
     int fd_;
     int listen_fd_;
     int events_;
     int revents_;
-    bool alive_ = false;
-    bool clear_readbuf_;
-    int read_or_write_;
-    struct sockaddr_in client_addr_;
     EventLoop *loop_;
     std::shared_ptr<Channel> self_;
 
     std::string peer_ip_;
     std::string peer_port_;
 
-    ChannelCallback read_callback_ = nullptr;
-    ChannelCallback write_callback_ = nullptr;
-    ChannelCallback close_callback_ = nullptr;
-    ChannelCallback error_callback_ = nullptr;
-
-    EventCommunicateCallback communicate_callback_ = nullptr;
-
-    EventHandler handler_ = nullptr;
-    EventHandler read_handler_ = nullptr;
-    EventHandler write_handler_ = nullptr;
-
-    bool write_flag_ = false;          // 标识写是否完成
-    bool write_callback_flag_ = false; // 标识是否执行过write_callback
+    EventHandler handler_;
+    EventHandler read_handler_;
+    EventHandler write_handler_;
 };
 
 } // namespace Imagine_Muduo

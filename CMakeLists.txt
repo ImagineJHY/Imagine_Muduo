@@ -1,20 +1,22 @@
 cmake_minimum_required(VERSION 3.0)
 project(IMAGINE_MUDUO)
 
-# set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g  -std=c++11 -Wall -Werror")
-# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -std=c++11 -Wall -Werror")
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g  -std=c++11")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -std=c++11")
-
-string(ASCII 27 Esc)
-set(R "${Esc}[0;31m")
-set(B "${Esc}[1;34m")
-set(E "${Esc}[m")
-
-message("${B}[Constructing LIB][Imagine Muduo]: Starting Imagine_Muduo lib building, lib name is ${PROJECT_NAME}...${E}")
+message("${B}[Imagine Muduo]: Starting Imagine_Muduo lib building, lib name is ${PROJECT_NAME}...${E}")
 
 if(NOT DEFINED IMAGINE_TARGET_LIB)
+
+    message("[Imagine Muduo]: IMAGINE_TARGET_LIB Is Not Defined")
     set(IMAGINE_TARGET_LIB "Imagine_Muduo")
+
+    # set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g  -std=c++11 -Wall -Werror")
+    # set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -std=c++11 -Wall -Werror")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g  -std=c++11")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -std=c++11")
+
+    string(ASCII 27 Esc)
+    set(R "${Esc}[0;31m")
+    set(B "${Esc}[1;34m")
+    set(E "${Esc}[m")
 
     set(IS_MAKE_PROJECT false)
     set(IMAGINE_SYSTEM_DIR ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/Imagine_System)
@@ -24,16 +26,16 @@ if(NOT DEFINED IMAGINE_TARGET_LIB)
 
     if(EXISTS ${IMAGINE_TOOL_DIR}/CMakeLists.txt)
         add_subdirectory(${IMAGINE_TOOL_DIR})
-        message("${B}[Constructing LIB][Imagine Muduo]: thirdparty Imagine_Tool exists, add subModule...${E}")
+        message("${B}[Imagine Muduo]: thirdparty Imagine_Tool exists, add subModule...${E}")
     else()
-        message("${R}[Constructing LIB][Imagine Muduo]: thirdparty Imagine_Tool NOT exists, cin make init to init it!${E}")
+        message("${R}[Imagine Muduo]: thirdparty Imagine_Tool NOT exists, cin make init to init it!${E}")
     endif()
 
     if(EXISTS ${IMAGINE_SYSTEM_DIR}/CMakeLists.txt)
         add_subdirectory(${IMAGINE_SYSTEM_DIR})
-        message("${B}[Constructing LIB][Imagine Muduo]: thirdparty Imagine_System exists, add subModule...${E}")
+        message("${B}[Imagine Muduo]: thirdparty Imagine_System exists, add subModule...${E}")
     else()
-        message("${R}[Constructing LIB][Imagine Muduo]: thirdparty Imagine_System NOT exists, cin make init to init it!${E}")
+        message("${R}[Imagine Muduo]: thirdparty Imagine_System NOT exists, cin make init to init it!${E}")
     endif()
 endif()
 
@@ -46,4 +48,6 @@ target_link_libraries(imagine_muduo pthread imagine_log imagine_time)
 
 if(TARGET imagine_tool)
     add_dependencies(imagine_muduo imagine_tool)
+else()
+    message("${R}[Imagine Muduo]: No Target Imagine_Tool!${E}")
 endif()
