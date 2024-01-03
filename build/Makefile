@@ -591,6 +591,19 @@ imagine_log/fast:
 	$(MAKE) -f thirdparty/Imagine_Tool/Imagine_Log/CMakeFiles/imagine_log.dir/build.make thirdparty/Imagine_Tool/Imagine_Log/CMakeFiles/imagine_log.dir/build
 .PHONY : imagine_log/fast
 
+#=============================================================================
+# Target rules for targets named imagine_statemachine
+
+# Build rule for target.
+imagine_statemachine: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 imagine_statemachine
+.PHONY : imagine_statemachine
+
+# fast build rule for target.
+imagine_statemachine/fast:
+	$(MAKE) -f thirdparty/Imagine_Tool/Imagine_StateMachine/CMakeFiles/imagine_statemachine.dir/build.make thirdparty/Imagine_Tool/Imagine_StateMachine/CMakeFiles/imagine_statemachine.dir/build
+.PHONY : imagine_statemachine/fast
+
 src/Acceptor.o: src/Acceptor.cpp.o
 
 .PHONY : src/Acceptor.o
@@ -906,6 +919,7 @@ help:
 	@echo "... yaml-cpp-parse"
 	@echo "... imagine_time"
 	@echo "... imagine_log"
+	@echo "... imagine_statemachine"
 	@echo "... src/Acceptor.o"
 	@echo "... src/Acceptor.i"
 	@echo "... src/Acceptor.s"

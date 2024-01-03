@@ -44,7 +44,7 @@ endif()
 file(GLOB IMAGINE_MUDUO_SRC_LIST ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
 add_library(imagine_muduo SHARED ${IMAGINE_MUDUO_SRC_LIST})
 target_include_directories(imagine_muduo PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
-target_link_libraries(imagine_muduo pthread imagine_log imagine_time)
+target_link_libraries(imagine_muduo pthread imagine_tool)
 
 if(TARGET imagine_tool)
     add_dependencies(imagine_muduo imagine_tool)
