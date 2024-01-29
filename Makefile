@@ -25,7 +25,10 @@ endif
 	cd ${tool_file_name} && make prepare
 
 build:
-	cd build && cmake .. && make imagine_muduo
+	cd build && cmake -DBUILD_MUDUO=OFF .. && make imagine_muduo
+
+muduo:
+	cd build && cmake -DBUILD_MUDUO=ON .. && make imagine_muduo
 
 clean:
 	cd build && make clean
