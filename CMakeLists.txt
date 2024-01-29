@@ -14,7 +14,7 @@ if(NOT DEFINED IMAGINE_TARGET_LIB)
 
     string(ASCII 27 Esc)
     set(R "${Esc}[1;31m")
-    set(G "${Esc}[1;32m")
+    set(G "${Esc}[0;32m")
     set(E "${Esc}[m")
 
     set(IS_MAKE_PROJECT false)
