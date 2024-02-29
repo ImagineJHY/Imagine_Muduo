@@ -50,6 +50,7 @@ void EventLoop::Init(const YAML::Node& config)
 
     if (singleton_log_mode_) {
         logger_ = SingletonLogger::GetInstance();
+        printf("logger addr in muduo is %p\n", logger_);
     } else {
         logger_ = new NonSingletonLogger();
         Logger::SetInstance(logger_);
@@ -197,6 +198,7 @@ EventLoop* EventLoop::CloseTimer(long long timer_id)
     }
     it->second->Close();
     timer_map_.erase(it);
+    pthread_mutex_unlock(&timer_map_lock_);
 
     return this;
 }
